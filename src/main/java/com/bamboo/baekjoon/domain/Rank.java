@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Getter
 public class Rank {
 
     @Id @GeneratedValue
