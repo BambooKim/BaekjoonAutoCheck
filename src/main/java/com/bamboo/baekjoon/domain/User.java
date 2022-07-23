@@ -1,23 +1,18 @@
 package com.bamboo.baekjoon.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 public class User {
 
     @Id @GeneratedValue
+    @Column(name = "user_id")
     private Long id;
 
     @Column(name = "kor_name", length = 32, nullable = false)
@@ -31,6 +26,10 @@ public class User {
 
     @Column(name = "boj_id", length = 64, nullable = false, unique = true)
     private String bojId;
+
+    @Column(name = "user_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
 
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;

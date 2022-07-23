@@ -1,20 +1,18 @@
 package com.bamboo.baekjoon.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 public class CheckHistory {
 
     @Id @GeneratedValue
+    @Column(name = "history_id")
     private Long id;
 
     @Column(name = "prob_no", nullable = false)

@@ -1,9 +1,6 @@
 package com.bamboo.baekjoon.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,12 +9,13 @@ import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 public class Term {
 
     @Id @GeneratedValue
+    @Column(name = "term_id")
     private Long id;
 
     @Column(name = "start_at", nullable = false)

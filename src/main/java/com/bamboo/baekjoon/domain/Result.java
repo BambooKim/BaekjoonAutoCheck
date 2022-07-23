@@ -1,20 +1,18 @@
 package com.bamboo.baekjoon.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 public class Result {
 
     @Id @GeneratedValue
+    @Column(name = "result_id")
     private Long id;
 
     private boolean success;

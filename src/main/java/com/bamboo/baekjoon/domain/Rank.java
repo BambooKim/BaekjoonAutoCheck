@@ -1,19 +1,17 @@
 package com.bamboo.baekjoon.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 public class Rank {
 
     @Id @GeneratedValue
+    @Column(name = "rank_id")
     private Long id;
 
     @Column(name = "score_level", nullable = false)
