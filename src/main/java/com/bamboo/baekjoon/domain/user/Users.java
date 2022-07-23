@@ -20,7 +20,7 @@ public class Users {
     @Column(name = "kor_name", length = 32, nullable = false)
     private String korName;
 
-    @Column(name = "user_tier", nullable = false)
+    @Column(name = "user_tier", nullable = true)
     private int userTier;
 
     @Column(name = "enter_year", nullable = false)
