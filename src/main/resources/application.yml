@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:h2:tcp://localhost/~/baekjoon
     username: sa
-    password: a
+    password:
     driver-class-name: org.h2.Driver
   mvc:
     pathmatch:
@@ -19,4 +19,4 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
-    org.hibernate.type: trace
+#    org.hibernate.type: trace

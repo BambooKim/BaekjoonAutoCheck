@@ -1,4 +1,4 @@
-package com.bamboo.baekjoon.domain;
+package com.bamboo.baekjoon.domain.user;
 
 import lombok.*;
 
@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class User {
+@Builder
+@ToString
+public class Users {
 
     @Id @GeneratedValue
     @Column(name = "user_id")
@@ -33,4 +35,6 @@ public class User {
 
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
+
+
 }

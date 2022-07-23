@@ -1,5 +1,6 @@
-package com.bamboo.baekjoon.domain;
+package com.bamboo.baekjoon.domain.term;
 
+import com.bamboo.baekjoon.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -12,7 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class Term {
+@Builder
+@ToString
+public class Term extends BaseTimeEntity {
 
     @Id @GeneratedValue
     @Column(name = "term_id")
