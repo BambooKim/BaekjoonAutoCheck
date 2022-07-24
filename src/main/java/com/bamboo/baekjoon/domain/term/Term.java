@@ -1,6 +1,7 @@
 package com.bamboo.baekjoon.domain.term;
 
 import com.bamboo.baekjoon.domain.BaseTimeEntity;
+import com.bamboo.baekjoon.domain.term.dto.TermRequestDto;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -26,4 +27,9 @@ public class Term extends BaseTimeEntity {
 
     @Column(name = "end_at", nullable = false)
     private LocalDateTime endAt;
+
+    public void changeTerm(TermRequestDto requestDto) {
+        this.startAt = requestDto.getStartAt();
+        this.endAt = requestDto.getEndAt();
+    }
 }

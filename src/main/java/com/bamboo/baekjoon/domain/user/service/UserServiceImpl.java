@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Override
     public UserResponseDto.Creation createUser(UserRequestDto.Creation createUserData) {
 
         validateDuplicateUser(createUserData.getBojId());
