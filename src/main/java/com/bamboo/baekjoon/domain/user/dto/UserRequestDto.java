@@ -1,5 +1,7 @@
 package com.bamboo.baekjoon.domain.user.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +14,8 @@ public class UserRequestDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class Creation {
 
         @NotNull(message = "이름을 입력해주세요.")
