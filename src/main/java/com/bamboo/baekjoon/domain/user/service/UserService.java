@@ -25,7 +25,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     public UserResponseDto.Creation createUser(UserRequestDto.Creation createUserData) {
-        // TODO: 먼저 중복체크 해야함.
+
+        validateDuplicateUser(createUserData.getBojId());
 
         JsonElement element = getUserInformationByJsonElement(createUserData.getBojId());
 
@@ -46,6 +47,13 @@ public class UserService {
         userRepository.save(user);
 
         return UserResponseDto.Creation.of(user);
+    }
+
+    private void validateDuplicateUser(String bojId) {
+        userRepository.findByBojId(bojId)
+                .ifPresent(m -> {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 사용중인 ID입니다.");
+                });
     }
 
     private int retrieveUserTier(JsonElement element) {
@@ -70,6 +78,9 @@ public class UserService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+
+        if (block == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ID 정보를 찾을 수 없습니다.");
 
         return JsonParser.parseString(block);
     }
