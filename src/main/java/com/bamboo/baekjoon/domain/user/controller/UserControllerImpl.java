@@ -17,7 +17,7 @@ public class UserControllerImpl implements UserController {
 
     private final UserService userService;
 
-    @PostMapping("/create-user")
+    @PostMapping("/user")
     public ResponseEntity<UserResponseDto.Creation> createUser(@Valid @RequestBody UserRequestDto.Creation createUserData) {
         UserResponseDto.Creation response = userService.createUser(createUserData);
 
