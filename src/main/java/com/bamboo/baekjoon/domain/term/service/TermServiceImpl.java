@@ -26,8 +26,7 @@ public class TermServiceImpl implements TermService {
                 .endAt(requestDto.getEndAt()).build();
 
         // startAt, endAt 비교
-        if (requestDto.getStartAt().isAfter(requestDto.getEndAt()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "시작 날짜와 마감 날짜가 유효하지 않습니다.");
+        validateDateTime(requestDto);
 
         termRepository.save(term);
 
@@ -57,6 +56,8 @@ public class TermServiceImpl implements TermService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Term이 존재하지 않습니다.");
         });
 
+        validateDateTime(requestDto);
+
         findTerm.changeTerm(requestDto);
 
         return TermResponseDto.of(findTerm);
@@ -69,5 +70,10 @@ public class TermServiceImpl implements TermService {
         });
 
         return "delete success";
+    }
+
+    private void validateDateTime(TermRequestDto requestDto) {
+        if (requestDto.getStartAt().isAfter(requestDto.getEndAt()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "시작 날짜와 마감 날짜가 유효하지 않습니다.");
     }
 }
