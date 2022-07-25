@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -57,6 +60,50 @@ public class CheckServiceImpl implements CheckService {
         checkRepository.save(check);
 
         return CheckResponseDto.Simple.of(check);
+    }
+
+    @Override
+    public List<CheckResponseDto.Simple> createChecks(CheckRequestDto.CreateList requestList) {
+        // requestList iter하면서 userId와 termId에 대한 HashSet 생성
+        HashSet<Long> userIdSet = new HashSet<>();
+        HashSet<Long> termIdSet = new HashSet<>();
+
+        requestList.getItems().forEach(item -> {
+            userIdSet.add(item.getUserId());
+            termIdSet.add(item.getTermId());
+        });
+
+        // repository에 리스트 전달하여 (in query) status:ACTIVE user와 term 땡겨옴
+        // 가져온거랑 리스트 개수 비교 -> 안맞으면 request로 들어온 값에 대해 없으므로 exception throw
+        List<Users> users = userRepository.selectUsersBySet(userIdSet);
+        if (users.size() != userIdSet.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 userId가 존재합니다.");
+        }
+
+        List<Term> terms = termRepository.selectTermsBySet(termIdSet);
+        if (terms.size() != termIdSet.size()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 termId가 존재합니다.");
+        }
+
+        // 땡겨온 애들은 아래에서 활용하기 위해 Map으로 변환 (key:id로 접근하기 위해)
+        Map<Long, Users> userMap = users.stream().collect(Collectors.toMap(Users::getId, user -> user, (a, b) -> b));
+        Map<Long, Term> termMap = terms.stream().collect(Collectors.toMap(Term::getId, term -> term, (a, b) -> b));
+
+        // requestList iter하면서 Check 생성 후 repository save -> response entity 생성 후 List add
+        List<CheckResponseDto.Simple> responseList = new ArrayList<>();
+        requestList.getItems().forEach(request -> {
+            Checks check = Checks.builder()
+                    .status(CheckStatus.PENDING)
+                    .success(false)
+                    .user(userMap.get(request.getUserId()))
+                    .term(termMap.get(request.getTermId()))
+                    .build();
+            checkRepository.save(check);
+
+            responseList.add(CheckResponseDto.Simple.of(check));
+        });
+
+        return responseList;
     }
 
     @Override

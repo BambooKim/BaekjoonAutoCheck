@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -20,6 +22,14 @@ public class CheckControllerImpl implements CheckController {
     @PostMapping("/check")
     public ResponseEntity<CheckResponseDto.Simple> createCheck(@RequestBody CheckRequestDto.Create requestDto) {
         CheckResponseDto.Simple response = checkService.createCheck(requestDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @PostMapping("/check-multiple")
+    public ResponseEntity<List<CheckResponseDto.Simple>> createChecks(@RequestBody CheckRequestDto.CreateList requestList) {
+        List<CheckResponseDto.Simple> response = checkService.createChecks(requestList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
