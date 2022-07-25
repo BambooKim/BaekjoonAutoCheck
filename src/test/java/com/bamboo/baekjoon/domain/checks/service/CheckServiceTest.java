@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -139,6 +141,210 @@ class CheckServiceTest {
         // when
         // then
         assertThrows(ResponseStatusException.class, () -> checkService.createCheck(requestDto));
+    }
+
+    @Test
+    @DisplayName("Check 생성 - Multiple")
+    public void createMultipleChecks() {
+        // given
+        Users user1 = Users.builder()
+                .korName("박민재")
+                .userTier(11)
+                .enterYear(2017)
+                .bojId("sobu0715")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        Users user2 = Users.builder()
+                .korName("최성원")
+                .userTier(11)
+                .enterYear(2018)
+                .bojId("choi5798")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        Users user3 = Users.builder()
+                .korName("장재훈")
+                .userTier(11)
+                .enterYear(2019)
+                .bojId("jae_hooni")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        Term term1 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 7, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 7, 25, 23, 59, 59))
+                .build();
+        Term term2 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 6, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 6, 25, 23, 59, 59))
+                .build();
+        Term term3 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 5, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 5, 25, 23, 59, 59))
+                .build();
+        termRepository.save(term1);
+        termRepository.save(term2);
+        termRepository.save(term3);
+
+        List<Users> users = new ArrayList<>();
+        users.add(user1);
+        users.add(user2);
+        users.add(user3);
+
+        List<Term> terms = new ArrayList<>();
+        terms.add(term1);
+        terms.add(term2);
+        terms.add(term3);
+
+        CheckRequestDto.CreateList createList = new CheckRequestDto.CreateList(new ArrayList<>());
+        for (Users user : users) {
+            for (Term term : terms) {
+                CheckRequestDto.Create item = CheckRequestDto.Create.builder().userId(user.getId()).termId(term.getId()).build();
+                createList.getItems().add(item);
+            }
+        }
+
+        // when
+        List<CheckResponseDto.Simple> responseList = checkService.createChecks(createList);
+        for (CheckResponseDto.Simple simple : responseList) {
+            System.out.println("simple = " + simple);
+        }
+
+        // then
+        assertThat(responseList.get(0).getUserInfo().getId()).isEqualTo(user1.getId());
+        assertThat(responseList.get(0).getTermInfo().getId()).isEqualTo(term1.getId());
+    }
+
+    @Test
+    @DisplayName("Check 생성 - Multiple: INACTIVE 한명 존재할때")
+    public void createMultipleChecksWithINACTIVE() {
+        // given
+        Users user1 = Users.builder()
+                .korName("박민재")
+                .userTier(11)
+                .enterYear(2017)
+                .bojId("sobu0715")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        Users user2 = Users.builder()
+                .korName("최성원")
+                .userTier(11)
+                .enterYear(2018)
+                .bojId("choi5798")
+                .status(UserStatus.INACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        Users user3 = Users.builder()
+                .korName("장재훈")
+                .userTier(11)
+                .enterYear(2019)
+                .bojId("jae_hooni")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+
+        Term term1 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 7, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 7, 25, 23, 59, 59))
+                .build();
+        Term term2 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 6, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 6, 25, 23, 59, 59))
+                .build();
+        Term term3 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 5, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 5, 25, 23, 59, 59))
+                .build();
+        termRepository.save(term1);
+        termRepository.save(term2);
+        termRepository.save(term3);
+
+        List<Users> users = new ArrayList<>();
+        users.add(user1);
+        users.add(user2);
+        users.add(user3);
+
+        List<Term> terms = new ArrayList<>();
+        terms.add(term1);
+        terms.add(term2);
+        terms.add(term3);
+
+        CheckRequestDto.CreateList createList = new CheckRequestDto.CreateList(new ArrayList<>());
+        for (Users user : users) {
+            for (Term term : terms) {
+                CheckRequestDto.Create item = CheckRequestDto.Create.builder().userId(user.getId()).termId(term.getId()).build();
+                createList.getItems().add(item);
+            }
+        }
+
+        // when
+        // then
+        assertThrows(ResponseStatusException.class, () -> checkService.createChecks(createList));
+    }
+
+    @Test
+    @DisplayName("Check 생성 - Multiple: 유효하지 않은 userId값")
+    public void createMultipleChecksWithInvalidId() {
+        // given
+        Users user1 = Users.builder()
+                .korName("박민재")
+                .userTier(11)
+                .enterYear(2017)
+                .bojId("sobu0715")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        Users user2 = Users.builder()
+                .korName("최성원")
+                .userTier(11)
+                .enterYear(2018)
+                .bojId("choi5798")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        Term term1 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 7, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 7, 25, 23, 59, 59))
+                .build();
+        Term term2 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 6, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 6, 25, 23, 59, 59))
+                .build();
+        termRepository.save(term1);
+        termRepository.save(term2);
+
+        List<Users> users = new ArrayList<>();
+        users.add(user1);
+        users.add(user2);
+        users.add(Users.builder().id(Long.MAX_VALUE).build());
+
+        List<Term> terms = new ArrayList<>();
+        terms.add(term1);
+        terms.add(term2);
+
+        CheckRequestDto.CreateList createList = new CheckRequestDto.CreateList(new ArrayList<>());
+        for (Users user : users) {
+            for (Term term : terms) {
+                CheckRequestDto.Create item = CheckRequestDto.Create.builder().userId(user.getId()).termId(term.getId()).build();
+                createList.getItems().add(item);
+            }
+        }
+
+        // when
+        // then
+        assertThrows(ResponseStatusException.class, () -> checkService.createChecks(createList));
     }
 
     @Test
