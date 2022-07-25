@@ -24,6 +24,10 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class CheckServiceImpl implements CheckService {
 
+    // TODO: {userId, termId} 는 UNIQUE여야 함.
+
+
+
     private final UserRepository userRepository;
     private final TermRepository termRepository;
     private final CheckRepository checkRepository;
@@ -81,5 +85,22 @@ public class CheckServiceImpl implements CheckService {
     @Override
     public Page<CheckResponseDto.Detail> getCheckDetailAll(Pageable pageable) {
         return checkRepository.findAll(pageable).map(CheckResponseDto.Detail::of);
+    }
+
+    // TODO: enum에 대한 검증
+    @Override
+    public CheckResponseDto.Detail updateCheck(Long id, CheckRequestDto.Update requestDto) {
+        Term findTerm = termRepository.findById(requestDto.getTermId()).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Term이 존재하지 않습니다.");
+        });
+
+        Checks findCheck = checkRepository.findById(id).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Check가 존재하지 않습니다.");
+        });
+
+        findCheck.changeCheck(requestDto.getStatus(), requestDto.getSuccess(),
+                requestDto.getReason(), findTerm);
+
+        return CheckResponseDto.Detail.of(findCheck);
     }
 }

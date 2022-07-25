@@ -52,4 +52,20 @@ public class Checks extends BaseTimeEntity {
                 ", term=" + term.getId() +
                 '}';
     }
+
+    public void changeCheck(CheckStatus status, Boolean success, FailureReason reason, Term term) {
+        if (status != null) {
+            this.status = status;
+        }
+
+        if (success != null) {
+            this.success = success;
+        }
+
+        if (reason != null) {
+            this.reason = reason;
+        }
+
+        this.term = term;
+    }
 }

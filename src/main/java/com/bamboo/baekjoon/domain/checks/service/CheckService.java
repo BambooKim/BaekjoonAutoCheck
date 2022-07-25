@@ -15,4 +15,6 @@ public interface CheckService {
     CheckResponseDto.Detail findCheckDetailById(Long id);
 
     Page<CheckResponseDto.Detail> getCheckDetailAll(Pageable pageable);
+
+    CheckResponseDto.Detail updateCheck(Long id, CheckRequestDto.Update requestDto);
 }

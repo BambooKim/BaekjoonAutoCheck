@@ -51,4 +51,12 @@ public class CheckControllerImpl implements CheckController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PutMapping("/check/{id}")
+    public ResponseEntity<CheckResponseDto.Detail> updateCheck(@PathVariable("id") Long id,
+                                                                   @RequestBody CheckRequestDto.Update requestDto) {
+        CheckResponseDto.Detail response = checkService.updateCheck(id, requestDto);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
 }
