@@ -90,9 +90,13 @@ public class CheckServiceImpl implements CheckService {
     // TODO: enum에 대한 검증
     @Override
     public CheckResponseDto.Detail updateCheck(Long id, CheckRequestDto.Update requestDto) {
-        Term findTerm = termRepository.findById(requestDto.getTermId()).orElseThrow(() -> {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Term이 존재하지 않습니다.");
-        });
+        Term findTerm = null;
+
+        if (requestDto.getTermId() != null) {
+            findTerm = termRepository.findById(requestDto.getTermId()).orElseThrow(() -> {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Term이 존재하지 않습니다.");
+            });
+        }
 
         Checks findCheck = checkRepository.findById(id).orElseThrow(() -> {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Check가 존재하지 않습니다.");

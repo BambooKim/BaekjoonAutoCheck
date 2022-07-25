@@ -66,6 +66,8 @@ public class Checks extends BaseTimeEntity {
             this.reason = reason;
         }
 
-        this.term = term;
+        if (term != null) {
+            this.term = term;
+        }
     }
 }
