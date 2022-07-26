@@ -134,6 +134,32 @@ public class CheckServiceImpl implements CheckService {
         return checkRepository.findAll(pageable).map(CheckResponseDto.Detail::of);
     }
 
+    // 이게 맞냐????
+    @Override
+    public Page<CheckResponseDto.Detail> getChecksByUserAndTerm
+            (List<Long> userIdList, List<Long> termIdList, Pageable pageable) {
+        if (userIdList == null) {
+            if (termIdList == null) {           // user X, term X - 그냥 전체 조회
+                return checkRepository.findAll(pageable).map(CheckResponseDto.Detail::of);
+            } else {                            // user X, term O -> term 별로 묶어야 함!
+                List<Term> terms = termRepository.findAllById(termIdList);
+
+                return checkRepository.findByTermIn(terms, pageable).map(CheckResponseDto.Detail::of);
+            }
+        } else {
+            List<Users> users = userRepository.findAllById(userIdList);
+
+            if (termIdList == null) {           // user O, term X -> user 별로 묶어야 함!
+                return checkRepository.findByUserIn(users, pageable).map(CheckResponseDto.Detail::of);
+            } else {                            // user O, term O
+                List<Term> terms = termRepository.findAllById(termIdList);
+
+                return checkRepository.findByUserInAndTermIn(users, terms, pageable)
+                        .map(CheckResponseDto.Detail::of);
+            }
+        }
+    }
+
     // TODO: enum에 대한 검증
 
     @Override

@@ -18,6 +18,8 @@ public interface CheckService {
 
     Page<CheckResponseDto.Detail> getCheckDetailAll(Pageable pageable);
 
+    Page<CheckResponseDto.Detail> getChecksByUserAndTerm(List<Long> userIdList, List<Long> termIdList, Pageable pageable);
+
     CheckResponseDto.Detail updateCheck(Long id, CheckRequestDto.Update requestDto);
 
     List<CheckResponseDto.Simple> createChecks(CheckRequestDto.CreateList requestList);

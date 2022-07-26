@@ -26,7 +26,6 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
     @PostMapping("/check-multiple")
     public ResponseEntity<List<CheckResponseDto.Simple>> createChecks(@RequestBody CheckRequestDto.CreateList requestList) {
         List<CheckResponseDto.Simple> response = checkService.createChecks(requestList);
@@ -58,6 +57,16 @@ public class CheckControllerImpl implements CheckController {
     @GetMapping("/check-detail")
     public ResponseEntity<Page<CheckResponseDto.Detail>> getCheckDetailAll(Pageable pageable) {
         Page<CheckResponseDto.Detail> response = checkService.getCheckDetailAll(pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/checks")
+    public ResponseEntity<Page<CheckResponseDto.Detail>> getCheckByUserAndTerm(
+                                        @RequestParam(value = "userId", required = false) List<Long> userIdList,
+                                        @RequestParam(value = "termId", required = false) List<Long> termIdList,
+                                        Pageable pageable) {
+        Page<CheckResponseDto.Detail> response = checkService.getChecksByUserAndTerm(userIdList, termIdList, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

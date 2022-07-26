@@ -1,6 +1,8 @@
 package com.bamboo.baekjoon.domain.checks.repository;
 
 import com.bamboo.baekjoon.domain.checks.Checks;
+import com.bamboo.baekjoon.domain.term.Term;
+import com.bamboo.baekjoon.domain.user.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -22,6 +24,15 @@ public interface CheckRepository extends JpaRepository<Checks, Long> {
     @Override
     @EntityGraph(attributePaths = {"user", "term"})
     Page<Checks> findAll(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"user", "term"})
+    Page<Checks> findByUserInAndTermIn(List<Users> users, List<Term> terms, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"user", "term"})
+    Page<Checks> findByUserIn(List<Users> users, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"user", "term"})
+    Page<Checks> findByTermIn(List<Term> terms, Pageable pageable);
 
     @Override
     @EntityGraph(attributePaths = {"user", "term"})
