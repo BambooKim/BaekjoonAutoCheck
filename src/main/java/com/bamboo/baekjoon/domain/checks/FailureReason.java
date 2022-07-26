@@ -1,5 +1,5 @@
 package com.bamboo.baekjoon.domain.checks;
 
 public enum FailureReason {
-    NO_SUCCESS, TIER_UNMATCH
+    NO_SUCCESS, TIER_UNMATCH, ERROR, TOO_OLD
 }

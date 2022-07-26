@@ -70,4 +70,17 @@ public class Checks extends BaseTimeEntity {
             this.term = term;
         }
     }
+
+    public void admitCheck() {
+        this.status = CheckStatus.COMPLETE;
+        this.success = true;
+        this.runAt = LocalDateTime.now();
+    }
+
+    public void failCheck(FailureReason reason) {
+        this.status = CheckStatus.COMPLETE;
+        this.success = false;
+        this.reason = reason;
+        this.runAt = LocalDateTime.now();
+    }
 }

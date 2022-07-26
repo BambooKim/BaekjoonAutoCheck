@@ -1,7 +1,9 @@
 package com.bamboo.baekjoon.domain.checks.service;
 
+import com.bamboo.baekjoon.domain.checks.CheckHistory;
 import com.bamboo.baekjoon.domain.checks.CheckStatus;
 import com.bamboo.baekjoon.domain.checks.Checks;
+import com.bamboo.baekjoon.domain.checks.FailureReason;
 import com.bamboo.baekjoon.domain.checks.dto.CheckRequestDto;
 import com.bamboo.baekjoon.domain.checks.dto.CheckResponseDto;
 import com.bamboo.baekjoon.domain.checks.repository.CheckRepository;
@@ -11,14 +13,24 @@ import com.bamboo.baekjoon.domain.term.repository.TermRepository;
 import com.bamboo.baekjoon.domain.user.UserStatus;
 import com.bamboo.baekjoon.domain.user.Users;
 import com.bamboo.baekjoon.domain.user.repository.UserRepository;
+import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,14 +39,116 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CheckServiceImpl implements CheckService {
 
+
     // TODO: {userId, termId} 는 UNIQUE여야 함.
 
-
-
     private final UserRepository userRepository;
+
     private final TermRepository termRepository;
     private final CheckRepository checkRepository;
     private final ChkHistoryRepository chkHistoryRepository;
+
+    @Override
+    public List<CheckResponseDto.AfterRun> runCheck(List<Long> checkIdList) {
+        // checkRepository에서 Check들 다 땡겨옴
+        List<Checks> findCheckList = checkRepository.findAllByIdIn(checkIdList);
+
+        Map<Users, List<Checks>> usersChecksListMap = new HashMap<>();
+
+        // 땡겨온 check들 iter하면서...
+        findCheckList.forEach(check -> {
+            if (usersChecksListMap.get(check.getUser()) == null) {
+                List<Checks> list = new ArrayList<>();
+                list.add(check);
+                usersChecksListMap.put(check.getUser(), list);
+            }
+
+            usersChecksListMap.get(check.getUser()).add(check);
+        });
+
+        // TODO: 다음 페이지 넘기는거 해야함
+
+        usersChecksListMap.keySet().forEach(user -> {
+            List<Checks> checks = usersChecksListMap.get(user);
+
+            String urlHead = "https://www.acmicpc.net/status?problem_id=&user_id=";
+            String urlTail = "&language_id=-1&result_id=4";
+            String url = urlHead + user.getBojId() + urlTail;
+
+            Connection connect = Jsoup.connect(url);
+            try {
+                Elements tableRows = connect.get().getElementsByTag("tbody").first()
+                        .getElementsByTag("tr");
+
+                for (Element tableRow : tableRows) {
+                    //System.out.println("tableRow = \n" + tableRow);
+
+                    String solvedDateTimeString = tableRow.getElementsByAttribute("data-timestamp")
+                            .get(0).attr("title");
+                    LocalDateTime solvedDateTime
+                            = LocalDateTime.parse(solvedDateTimeString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                    Integer probNo = Integer.parseInt(tableRow.getElementsByAttributeValueContaining("href", "/problem")
+                            .get(0).text());
+                    String probInfoUrl = "https://solved.ac/api/v3/search/problem?query=" + probNo;
+
+                    String block = WebClient.create(probInfoUrl).get().accept(MediaType.APPLICATION_JSON)
+                            .retrieve().bodyToMono(String.class).block();
+
+                    if (block == null)
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문제 정보를 찾을 수 없습니다.");
+
+                    int probTier = JsonParser.parseString(block).getAsJsonObject().get("items").getAsJsonArray().get(0)
+                            .getAsJsonObject().get("level").getAsInt();
+
+                    for (Checks check : checks) {
+                        if (check.getStatus() == CheckStatus.COMPLETE)
+                            continue;
+
+                        Term term = check.getTerm();
+                        if (solvedDateTime.isAfter(term.getStartAt()) && solvedDateTime.isBefore(term.getEndAt())) {
+                            // probNo, probTier, solvedAt, user, check -> CheckHistory
+                            // CheckHistory 생성
+                            CheckHistory history = CheckHistory.builder()
+                                    .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
+                                    .user(user).check(check).build();
+                            chkHistoryRepository.save(history);
+
+                            // Check 성공/실패 판정
+                            if (user.getEnterYear() == 2022) {
+                                check.admitCheck();
+                            } else {
+                                if (probTier > (user.getUserTier() - 5)) {
+                                    check.admitCheck();
+                                } else {
+                                    check.failCheck(FailureReason.TIER_UNMATCH);
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        List<CheckResponseDto.AfterRun> response = new ArrayList<>();
+
+        findCheckList.forEach(check -> {
+            if (check.getStatus() == CheckStatus.PENDING) {
+                check.failCheck(FailureReason.NO_SUCCESS);
+            }
+
+            CheckResponseDto.AfterRun item = CheckResponseDto.AfterRun.of(check);
+            System.out.println("item.toString() = " + item.toString());
+            response.add(item);
+        });
+
+        return response;
+    }
 
     @Override
     public CheckResponseDto.Simple createCheck(CheckRequestDto.Create requestDto) {
@@ -133,8 +247,8 @@ public class CheckServiceImpl implements CheckService {
     public Page<CheckResponseDto.Detail> getCheckDetailAll(Pageable pageable) {
         return checkRepository.findAll(pageable).map(CheckResponseDto.Detail::of);
     }
-
     // 이게 맞냐????
+
     @Override
     public Page<CheckResponseDto.Detail> getChecksByUserAndTerm
             (List<Long> userIdList, List<Long> termIdList, Pageable pageable) {

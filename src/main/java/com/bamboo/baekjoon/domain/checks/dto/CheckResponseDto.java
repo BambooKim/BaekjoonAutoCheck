@@ -63,4 +63,27 @@ public class CheckResponseDto {
                     .build();
         }
     }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class AfterRun {
+
+        private Long id;
+        private CheckStatus status;
+        private boolean success;
+        private FailureReason reason;
+        private LocalDateTime runAt;
+
+        public static AfterRun of(Checks check) {
+            return AfterRun.builder()
+                    .id(check.getId())
+                    .status(check.getStatus())
+                    .success(check.isSuccess())
+                    .reason(check.getReason())
+                    .runAt(check.getRunAt())
+                    .build();
+        }
+    }
 }

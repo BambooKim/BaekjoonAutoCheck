@@ -34,6 +34,9 @@ public interface CheckRepository extends JpaRepository<Checks, Long> {
     @EntityGraph(attributePaths = {"user", "term"})
     Page<Checks> findByTermIn(List<Term> terms, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"user", "term"})
+    List<Checks> findAllByIdIn(List<Long> checkIdList);
+
     @Override
     @EntityGraph(attributePaths = {"user", "term"})
     Optional<Checks> findById(Long aLong);
