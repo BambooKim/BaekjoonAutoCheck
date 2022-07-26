@@ -150,8 +150,7 @@ public class CheckServiceImpl implements CheckService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Check가 존재하지 않습니다.");
         });
 
-        findCheck.changeCheck(requestDto.getStatus(), requestDto.getSuccess(),
-                requestDto.getReason(), findTerm);
+        findCheck.changeCheck(requestDto.getStatus(), requestDto.getSuccess(), requestDto.getReason(), findTerm);
 
         return CheckResponseDto.Detail.of(findCheck);
     }
@@ -161,6 +160,19 @@ public class CheckServiceImpl implements CheckService {
         checkRepository.findById(id).ifPresentOrElse(checkRepository::delete, () -> {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Check가 존재하지 않습니다.");
         });
+
+        return "delete success";
+    }
+
+    @Override
+    public String deleteByParams(List<Long> params) {
+        if (params.size() != checkRepository.countByList(params))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 Check Id 요청이 있습니다.");
+
+        if (params.size() == 0)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Check Id를 입력해주세요.");
+
+        checkRepository.deleteChecksByIdIn(params);
 
         return "delete success";
     }

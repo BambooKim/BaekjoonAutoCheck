@@ -477,4 +477,131 @@ class CheckServiceTest {
     public void deleteCheckByNoId() {
         assertThrows(ResponseStatusException.class, () -> checkService.deleteById(Long.MAX_VALUE));
     }
+
+    @Test
+    @DisplayName("Check 삭제 - List로")
+    public void deleteChecksByList() {
+        // given
+        Users user1 = Users.builder()
+                .korName("박민재")
+                .userTier(11)
+                .enterYear(2017)
+                .bojId("sobu0715")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        Users user2 = Users.builder()
+                .korName("최성원")
+                .userTier(11)
+                .enterYear(2018)
+                .bojId("choi5798")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        Term term1 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 7, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 7, 25, 23, 59, 59))
+                .build();
+        Term term2 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 6, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 6, 25, 23, 59, 59))
+                .build();
+        termRepository.save(term1);
+        termRepository.save(term2);
+
+        List<Users> users = new ArrayList<>();
+        users.add(user1);
+        users.add(user2);
+
+        List<Term> terms = new ArrayList<>();
+        terms.add(term1);
+        terms.add(term2);
+
+        List<Long> checkIdList = new ArrayList<>();
+        for (Users user : users) {
+            for (Term term : terms) {
+                Checks check = Checks.builder().status(CheckStatus.PENDING).success(false).user(user).term(term).build();
+                checkRepository.save(check);
+                checkIdList.add(check.getId());
+            }
+        }
+
+        // when
+        String message = checkService.deleteByParams(checkIdList);
+
+        // then
+        assertThat(message).isEqualTo("delete success");
+        assertThat(checkRepository.countByList(checkIdList)).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Check 삭제 - List에 없는 Id 존재")
+    public void deleteChecksByListWithNoId() {
+        // given
+        Users user1 = Users.builder()
+                .korName("박민재")
+                .userTier(11)
+                .enterYear(2017)
+                .bojId("sobu0715")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        Users user2 = Users.builder()
+                .korName("최성원")
+                .userTier(11)
+                .enterYear(2018)
+                .bojId("choi5798")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        Term term1 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 7, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 7, 25, 23, 59, 59))
+                .build();
+        Term term2 = Term.builder()
+                .startAt(LocalDateTime.of(2022, 6, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 6, 25, 23, 59, 59))
+                .build();
+        termRepository.save(term1);
+        termRepository.save(term2);
+
+        List<Users> users = new ArrayList<>();
+        users.add(user1);
+        users.add(user2);
+
+        List<Term> terms = new ArrayList<>();
+        terms.add(term1);
+        terms.add(term2);
+
+        List<Long> checkIdList = new ArrayList<>();
+        checkIdList.add(Long.MAX_VALUE);
+        for (Users user : users) {
+            for (Term term : terms) {
+                Checks check = Checks.builder().status(CheckStatus.PENDING).success(false).user(user).term(term).build();
+                checkRepository.save(check);
+                checkIdList.add(check.getId());
+            }
+        }
+
+        // when
+        // then
+        assertThrows(ResponseStatusException.class, () -> checkService.deleteByParams(checkIdList));
+    }
+
+    @Test
+    @DisplayName("Check 삭제 - 빈 List")
+    public void deleteChecksByEmptyList() {
+        // given
+        List<Long> checkIdList = new ArrayList<>();
+
+        // when
+        // then
+        assertThrows(ResponseStatusException.class, () -> checkService.deleteByParams(checkIdList));
+    }
 }

@@ -24,4 +24,5 @@ public interface CheckService {
 
     String deleteById(Long id);
 
+    String deleteByParams(List<Long> params);
 }
