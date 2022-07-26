@@ -135,6 +135,7 @@ public class CheckServiceImpl implements CheckService {
     }
 
     // TODO: enum에 대한 검증
+
     @Override
     public CheckResponseDto.Detail updateCheck(Long id, CheckRequestDto.Update requestDto) {
         Term findTerm = null;
@@ -153,5 +154,14 @@ public class CheckServiceImpl implements CheckService {
                 requestDto.getReason(), findTerm);
 
         return CheckResponseDto.Detail.of(findCheck);
+    }
+
+    @Override
+    public String deleteById(Long id) {
+        checkRepository.findById(id).ifPresentOrElse(checkRepository::delete, () -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Check가 존재하지 않습니다.");
+        });
+
+        return "delete success";
     }
 }

@@ -19,5 +19,5 @@ public interface CheckController {
     ResponseEntity<CheckResponseDto.Detail> searchCheckDetailById(Long id);
     ResponseEntity<Page<CheckResponseDto.Detail>> getCheckDetailAll(Pageable pageable);
     ResponseEntity<CheckResponseDto.Detail> updateCheck(Long id, CheckRequestDto.Update requestDto);
-
+    ResponseEntity<String> deleteCheck(Long id);
 }

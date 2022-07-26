@@ -440,4 +440,41 @@ class CheckServiceTest {
         assertThat(response2.getUserInfo().getId()).isEqualTo(check.getUser().getId());
         assertThat(response2.getTermInfo().getId()).isEqualTo(check.getTerm().getId());
     }
+
+    @Test
+    @DisplayName("Check 삭제")
+    public void deleteCheck() {
+        // given
+        Users user = Users.builder()
+                .korName("박민재")
+                .userTier(11)
+                .enterYear(2017)
+                .bojId("sobu0715")
+                .status(UserStatus.ACTIVE)
+                .joinedAt(LocalDateTime.now())
+                .build();
+        userRepository.save(user);
+
+        Term term = Term.builder()
+                .startAt(LocalDateTime.of(2022, 7, 23, 0, 0, 0))
+                .endAt(LocalDateTime.of(2022, 7, 25, 23, 59, 59))
+                .build();
+        termRepository.save(term);
+
+        Checks check = Checks.builder().status(CheckStatus.PENDING).success(false).user(user).term(term).build();
+        checkRepository.save(check);
+
+        // when
+        String message = checkService.deleteById(check.getId());
+
+        // then
+        assertThat(message).isEqualTo("delete success");
+        assertThat(checkRepository.findById(check.getId()).isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("없는 Id로 Check 삭제 시도")
+    public void deleteCheckByNoId() {
+        assertThrows(ResponseStatusException.class, () -> checkService.deleteById(Long.MAX_VALUE));
+    }
 }

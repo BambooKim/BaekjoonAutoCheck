@@ -69,4 +69,11 @@ public class CheckControllerImpl implements CheckController {
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
+
+    @DeleteMapping("/check/{id}")
+    public ResponseEntity<String> deleteCheck(@PathVariable("id") Long id) {
+        String response = checkService.deleteById(id);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
 }

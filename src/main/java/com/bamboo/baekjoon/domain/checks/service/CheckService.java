@@ -21,4 +21,7 @@ public interface CheckService {
     CheckResponseDto.Detail updateCheck(Long id, CheckRequestDto.Update requestDto);
 
     List<CheckResponseDto.Simple> createChecks(CheckRequestDto.CreateList requestList);
+
+    String deleteById(Long id);
+
 }
