@@ -28,10 +28,6 @@ public class CheckHistory extends BaseTimeEntity {
     private LocalDateTime solvedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "check_id", nullable = false)
     private Checks check;
 
@@ -42,7 +38,6 @@ public class CheckHistory extends BaseTimeEntity {
                 ", probNo=" + probNo +
                 ", probTier=" + probTier +
                 ", solvedAt=" + solvedAt +
-                ", user=" + user.getKorName() +
                 ", check=" + check.getId() +
                 '}';
     }

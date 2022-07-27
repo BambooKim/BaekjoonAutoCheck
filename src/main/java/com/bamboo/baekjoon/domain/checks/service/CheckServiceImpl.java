@@ -154,7 +154,7 @@ public class CheckServiceImpl implements CheckService {
                                 if (user.getEnterYear() == 2022) {
                                     CheckHistory history = CheckHistory.builder()
                                             .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
-                                            .user(user).check(check).build();
+                                            .check(check).build();
                                     chkHistoryRepository.save(history);
 
                                     check.admitCheck();
@@ -162,7 +162,7 @@ public class CheckServiceImpl implements CheckService {
                                     if (probTier > (user.getUserTier() - 5)) {
                                         CheckHistory history = CheckHistory.builder()
                                                 .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
-                                                .user(user).check(check).build();
+                                                .check(check).build();
                                         chkHistoryRepository.save(history);
 
                                         check.admitCheck();
