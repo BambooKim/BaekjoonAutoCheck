@@ -141,8 +141,9 @@ public class CheckServiceImpl implements CheckService {
 
                         for (Checks check : checks) {
 
-                            if (check.getStatus() == CheckStatus.COMPLETE)
-                                continue;
+                            // CheckHistory가 Check당 한번만 생성되게 됨...
+//                            if (check.getStatus() == CheckStatus.COMPLETE)
+//                                continue;
 
                             Term term = check.getTerm();
                             if (solvedDateTime.isAfter(term.getStartAt()) && solvedDateTime.isBefore(term.getEndAt())) {
