@@ -49,16 +49,33 @@ public class CheckServiceImpl implements CheckService {
     private final ChkHistoryRepository chkHistoryRepository;
 
     @Override
-    public List<CheckResponseDto.AfterRun> runCheck(List<Long> checkIdList) {
-        // checkRepository에서 Check들 다 땡겨옴
-        List<Checks> findCheckList = checkRepository.findAllByIdIn(checkIdList);
+    public List<CheckResponseDto.AfterRun> runCheckByTerm(List<Long> termIdList) {
 
+        return runCheckActual(checkRepository.findByTermIn(termIdList));
+    }
+
+    @Override
+    public List<CheckResponseDto.AfterRun> runCheckByUser(List<Long> userIdList) {
+
+        return runCheckActual(checkRepository.findByUserIn(userIdList));
+    }
+
+    @Override
+    public List<CheckResponseDto.AfterRun> runCheck(List<Long> checkIdList) {
+
+        return runCheckActual(checkRepository.findAllByIdIn(checkIdList));
+    }
+
+    public List<CheckResponseDto.AfterRun> runCheckActual(List<Checks> findCheckList) {
         Map<Users, List<Checks>> usersChecksListMap = new HashMap<>();
 
         LocalDateTime oldestStartAt = LocalDateTime.MAX;
 
         // 땡겨온 check들 iter하면서...
         for (Checks check : findCheckList) {
+            if (check.getTerm().getEndAt().isAfter(LocalDateTime.now()))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아직 마감이 되지 않았습니다.");
+
             if (oldestStartAt.isAfter(check.getTerm().getStartAt()))
                 oldestStartAt = check.getTerm().getStartAt();
 

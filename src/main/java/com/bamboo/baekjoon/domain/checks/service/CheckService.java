@@ -29,4 +29,8 @@ public interface CheckService {
     String deleteByParams(List<Long> params);
 
     List<CheckResponseDto.AfterRun> runCheck(List<Long> checkIdList);
+
+    List<CheckResponseDto.AfterRun> runCheckByTerm(List<Long> termIdList);
+
+    List<CheckResponseDto.AfterRun> runCheckByUser(List<Long> userIdList);
 }

@@ -17,6 +17,13 @@ import java.util.Optional;
 
 public interface CheckRepository extends JpaRepository<Checks, Long> {
 
+
+    @Query("select c from Checks c join fetch c.user join fetch c.term where c.term.id in :termIdList and c.status = 'PENDING'")
+    List<Checks> findByTermIn(@Param("termIdList") List<Long> termIdList);
+
+    @Query("select c from Checks c join fetch c.user join fetch c.term where c.user.id in :userIdList and c.status = 'PENDING'")
+    List<Checks> findByUserIn(@Param("userIdList") List<Long> userIdList);
+
     @Override
     @EntityGraph(attributePaths = {"user", "term"})
     List<Checks> findAll();

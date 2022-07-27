@@ -5,14 +5,15 @@ import com.bamboo.baekjoon.domain.checks.dto.CheckResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 import java.util.List;
 
 
 public interface CheckController {
-
+    ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByUser(List<Long> userIdList);
+    ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckById(List<Long> checkIdList);
+    ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByTerm(List<Long> termIdList);
     ResponseEntity<CheckResponseDto.Simple> createCheck(CheckRequestDto.Create requestDto);
     ResponseEntity<List<CheckResponseDto.Simple>> createChecks(CheckRequestDto.CreateList requestList);
     ResponseEntity<CheckResponseDto.Simple> searchCheckSimpleById(Long id);

@@ -19,8 +19,22 @@ public class CheckControllerImpl implements CheckController {
 
     private final CheckService checkService;
 
-    @PostMapping("/check/run")
-    public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheck(@RequestBody List<Long> checkIdList) {
+    @PostMapping("/check/runByUser")
+    public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByUser(@RequestBody List<Long> userIdList) {
+        List<CheckResponseDto.AfterRun> response = checkService.runCheckByUser(userIdList);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/check/runByTerm")
+    public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByTerm(@RequestBody List<Long> termIdList) {
+        List<CheckResponseDto.AfterRun> response = checkService.runCheckByTerm(termIdList);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/check/runByCheck")
+    public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckById(@RequestBody List<Long> checkIdList) {
         List<CheckResponseDto.AfterRun> response = checkService.runCheck(checkIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
