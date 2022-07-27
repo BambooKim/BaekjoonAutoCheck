@@ -55,8 +55,13 @@ public class CheckServiceImpl implements CheckService {
 
         Map<Users, List<Checks>> usersChecksListMap = new HashMap<>();
 
+        LocalDateTime oldestStartAt = LocalDateTime.MAX;
+
         // 땡겨온 check들 iter하면서...
-        findCheckList.forEach(check -> {
+        for (Checks check : findCheckList) {
+            if (oldestStartAt.isAfter(check.getTerm().getStartAt()))
+                oldestStartAt = check.getTerm().getStartAt();
+
             if (usersChecksListMap.get(check.getUser()) == null) {
                 List<Checks> list = new ArrayList<>();
                 list.add(check);
@@ -64,10 +69,9 @@ public class CheckServiceImpl implements CheckService {
             }
 
             usersChecksListMap.get(check.getUser()).add(check);
-        });
+        }
 
-        // TODO: 다음 페이지 넘기는거 해야함
-
+        LocalDateTime finalOldestStartAt = oldestStartAt;
         usersChecksListMap.keySet().forEach(user -> {
             List<Checks> checks = usersChecksListMap.get(user);
 
@@ -75,75 +79,99 @@ public class CheckServiceImpl implements CheckService {
             String urlTail = "&language_id=-1&result_id=4";
             String url = urlHead + user.getBojId() + urlTail;
 
-            Connection connect = Jsoup.connect(url);
-            try {
-                Elements tableRows = connect.get().getElementsByTag("tbody").first()
-                        .getElementsByTag("tr");
+            boolean isFirstPage = true;
+            boolean isFirstRow = true;
+            boolean needMorePage = true;
+            String submitNo = "";
 
-                for (Element tableRow : tableRows) {
-                    //System.out.println("tableRow = \n" + tableRow);
+            while (needMorePage) {
+                Connection connect = Jsoup.connect(url);
+                try {
+                    Elements tableRows = connect.get().getElementsByTag("tbody").first()
+                            .getElementsByTag("tr");
 
-                    String solvedDateTimeString = tableRow.getElementsByAttribute("data-timestamp")
-                            .get(0).attr("title");
-                    LocalDateTime solvedDateTime
-                            = LocalDateTime.parse(solvedDateTimeString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    for (Element tableRow : tableRows) {
+                        if (!isFirstPage && isFirstRow) {
+                            isFirstRow = false;
 
-                    Integer probNo = Integer.parseInt(tableRow.getElementsByAttributeValueContaining("href", "/problem")
-                            .get(0).text());
-                    String probInfoUrl = "https://solved.ac/api/v3/search/problem?query=" + probNo;
-
-                    String block = WebClient.create(probInfoUrl).get().accept(MediaType.APPLICATION_JSON)
-                            .retrieve().bodyToMono(String.class).block();
-
-                    if (block == null)
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문제 정보를 찾을 수 없습니다.");
-
-                    int probTier = JsonParser.parseString(block).getAsJsonObject().get("items").getAsJsonArray().get(0)
-                            .getAsJsonObject().get("level").getAsInt();
-
-                    for (Checks check : checks) {
-                        if (check.getStatus() == CheckStatus.COMPLETE)
                             continue;
+                        }
 
-                        Term term = check.getTerm();
-                        if (solvedDateTime.isAfter(term.getStartAt()) && solvedDateTime.isBefore(term.getEndAt())) {
-                            // probNo, probTier, solvedAt, user, check -> CheckHistory
-                            // CheckHistory 생성
-                            CheckHistory history = CheckHistory.builder()
-                                    .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
-                                    .user(user).check(check).build();
-                            chkHistoryRepository.save(history);
+                        submitNo = tableRow.id().substring(9);
 
-                            // Check 성공/실패 판정
-                            if (user.getEnterYear() == 2022) {
-                                check.admitCheck();
-                            } else {
-                                if (probTier > (user.getUserTier() - 5)) {
-                                    check.admitCheck();
-                                } else {
-                                    check.failCheck(FailureReason.TIER_UNMATCH);
-                                }
-                            }
+                        String solvedDateTimeString = tableRow.getElementsByAttribute("data-timestamp")
+                                .get(0).attr("title");
+                        LocalDateTime solvedDateTime
+                                = LocalDateTime.parse(solvedDateTimeString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
+                        if (solvedDateTime.isBefore(finalOldestStartAt)) {
+                            needMorePage = false;
                             break;
                         }
+
+                        Integer probNo = Integer.parseInt(tableRow.getElementsByAttributeValueContaining("href", "/problem")
+                                .get(0).text());
+                        String probInfoUrl = "https://solved.ac/api/v3/search/problem?query=" + probNo;
+
+                        String block = WebClient.create(probInfoUrl).get().accept(MediaType.APPLICATION_JSON)
+                                .retrieve().bodyToMono(String.class).block();
+
+                        if (block == null)
+                            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "문제 정보를 찾을 수 없습니다.");
+
+                        int probTier = JsonParser.parseString(block).getAsJsonObject().get("items").getAsJsonArray().get(0)
+                                .getAsJsonObject().get("level").getAsInt();
+
+                        for (Checks check : checks) {
+
+                            if (check.getStatus() == CheckStatus.COMPLETE)
+                                continue;
+
+                            Term term = check.getTerm();
+                            if (solvedDateTime.isAfter(term.getStartAt()) && solvedDateTime.isBefore(term.getEndAt())) {
+                                // probNo, probTier, solvedAt, user, check -> CheckHistory
+                                // CheckHistory 생성
+                                CheckHistory history = CheckHistory.builder()
+                                        .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
+                                        .user(user).check(check).build();
+                                chkHistoryRepository.save(history);
+
+                                // Check 성공/실패 판정
+                                if (user.getEnterYear() == 2022) {
+                                    check.admitCheck();
+                                } else {
+                                    if (probTier > (user.getUserTier() - 5)) {
+                                        check.admitCheck();
+                                    } else {
+                                        check.failCheck(FailureReason.TIER_UNMATCH);
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
                     }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
-            } catch (IOException e) {
-                e.printStackTrace();
+                isFirstPage = false;
+                isFirstRow = true;
+                url = "https://www.acmicpc.net/status?user_id=rlaqjarn1008&result_id=4&top=" + submitNo;
             }
         });
 
+        /*
+         * Create Response DTO List
+         */
         List<CheckResponseDto.AfterRun> response = new ArrayList<>();
-
         findCheckList.forEach(check -> {
             if (check.getStatus() == CheckStatus.PENDING) {
                 check.failCheck(FailureReason.NO_SUCCESS);
             }
 
             CheckResponseDto.AfterRun item = CheckResponseDto.AfterRun.of(check);
-            System.out.println("item.toString() = " + item.toString());
             response.add(item);
         });
 
