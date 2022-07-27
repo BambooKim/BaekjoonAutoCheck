@@ -167,7 +167,10 @@ public class CheckServiceImpl implements CheckService {
 
                                         check.admitCheck();
                                     } else {
-                                        check.failCheck(FailureReason.TIER_UNMATCH);
+                                        // 하나의 Check에 여러 문제를 풀었는데, 처음 제출은 성공인데 다음 제출이 TIER_UNMATCH인 경우
+                                        // -> 성공 처리해야함, 다시말해 성공이 아닐 때에만 진입하여 fail 처리해야함.
+                                        if (!check.isSuccess())
+                                            check.failCheck(FailureReason.TIER_UNMATCH);
                                     }
                                 }
 
