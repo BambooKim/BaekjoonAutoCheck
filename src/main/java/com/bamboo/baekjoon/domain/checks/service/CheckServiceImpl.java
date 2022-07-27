@@ -148,16 +148,22 @@ public class CheckServiceImpl implements CheckService {
                             if (solvedDateTime.isAfter(term.getStartAt()) && solvedDateTime.isBefore(term.getEndAt())) {
                                 // probNo, probTier, solvedAt, user, check -> CheckHistory
                                 // CheckHistory 생성
-                                CheckHistory history = CheckHistory.builder()
-                                        .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
-                                        .user(user).check(check).build();
-                                chkHistoryRepository.save(history);
 
                                 // Check 성공/실패 판정
                                 if (user.getEnterYear() == 2022) {
+                                    CheckHistory history = CheckHistory.builder()
+                                            .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
+                                            .user(user).check(check).build();
+                                    chkHistoryRepository.save(history);
+
                                     check.admitCheck();
                                 } else {
                                     if (probTier > (user.getUserTier() - 5)) {
+                                        CheckHistory history = CheckHistory.builder()
+                                                .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
+                                                .user(user).check(check).build();
+                                        chkHistoryRepository.save(history);
+
                                         check.admitCheck();
                                     } else {
                                         check.failCheck(FailureReason.TIER_UNMATCH);
