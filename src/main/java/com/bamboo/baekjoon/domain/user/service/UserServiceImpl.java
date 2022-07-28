@@ -19,7 +19,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -88,6 +90,25 @@ public class UserServiceImpl implements UserService {
 
                 response.add(UserResponseDto.Tier.of(user));
             }
+        });
+
+        return response;
+    }
+
+    @Override
+    public List<UserResponseDto.Status> updateUserStatus(List<UserRequestDto.Status> list) {
+        List<Long> userIdList = new ArrayList<>();
+        list.forEach(item -> userIdList.add(item.getUserId()));
+
+        Map<Long, Users> userMap = new HashMap<>();
+        userRepository.findAllById(userIdList).forEach(user -> userMap.put(user.getId(), user));
+
+        List<UserResponseDto.Status> response = new ArrayList<>();
+        list.forEach(item -> {
+            Users user = userMap.get(item.getUserId());
+            user.changeStatus(item.getStatus());
+
+            response.add(UserResponseDto.Status.of(user));
         });
 
         return response;

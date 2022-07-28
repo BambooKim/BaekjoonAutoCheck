@@ -25,6 +25,12 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PutMapping("/user/status")
+    public ResponseEntity<List<UserResponseDto.Status>> updateUserStatus(@Valid @RequestBody List<UserRequestDto.Status> list) {
+        List<UserResponseDto.Status> response = userService.updateUserStatus(list);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
 
     @PutMapping("/user/tier")
     public ResponseEntity<List<UserResponseDto.Tier>> updateUserTier(@RequestBody List<Long> userIdList) {

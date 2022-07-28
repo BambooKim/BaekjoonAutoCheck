@@ -21,4 +21,6 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
     @Query("select u from Users u where u.id in :userIds and u.status = 'ACTIVE'")
     List<Users> selectUsersIn(@Param("userIds") Collection<Long> userIds);
+
+    List<Users> findAllByIdIn(List<Long> userIdList);
 }

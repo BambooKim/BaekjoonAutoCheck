@@ -89,4 +89,24 @@ public class UserResponseDto {
                     .build();
         }
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @ToString
+    public static class Status {
+
+        private Long id;
+        private String korName;
+        private UserStatus status;
+
+        public static Status of(Users user) {
+            return Status.builder()
+                    .id(user.getId())
+                    .korName(user.getKorName())
+                    .status(user.getStatus())
+                    .build();
+        }
+    }
 }

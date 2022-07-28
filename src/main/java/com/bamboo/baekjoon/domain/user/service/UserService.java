@@ -10,4 +10,6 @@ public interface UserService {
     UserResponseDto.Creation createUser(UserRequestDto.Creation createUserData);
 
     List<UserResponseDto.Tier> updateUserTier(List<Long> userIdList);
+
+    List<UserResponseDto.Status> updateUserStatus(List<UserRequestDto.Status> list);
 }

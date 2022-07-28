@@ -39,4 +39,8 @@ public class Users {
     public void changeTier(int userTier) {
         this.userTier = userTier;
     }
+
+    public void changeStatus(UserStatus status) {
+        this.status = status;
+    }
 }

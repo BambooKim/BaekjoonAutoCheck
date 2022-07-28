@@ -1,13 +1,9 @@
 package com.bamboo.baekjoon.domain.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.bamboo.baekjoon.domain.user.UserStatus;
+import lombok.*;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 
 public class UserRequestDto {
@@ -29,5 +25,20 @@ public class UserRequestDto {
         @NotNull(message = "백준 아이디를 입력해주세요.")
         private String bojId;
 
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class Status {
+
+        @NotEmpty(message = "User의 id를 입력해주세요.")
+        @Positive(message = "id는 양수입니다.")
+        private Long userId;
+
+        @NotEmpty(message = "Status를 입력해주세요.")
+        private UserStatus status;
     }
 }
