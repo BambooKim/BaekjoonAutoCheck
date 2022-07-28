@@ -1,7 +1,6 @@
 package com.bamboo.baekjoon.domain.checks;
 
 import com.bamboo.baekjoon.domain.BaseTimeEntity;
-import com.bamboo.baekjoon.domain.user.Users;
 import lombok.*;
 
 import javax.persistence.*;

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,4 +25,11 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+
+    @PutMapping("/user/tier")
+    public ResponseEntity<List<UserResponseDto.Tier>> updateUserTier(@RequestBody List<Long> userIdList) {
+        List<UserResponseDto.Tier> response = userService.updateUserTier(userIdList);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
 }

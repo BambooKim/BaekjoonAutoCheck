@@ -36,5 +36,7 @@ public class Users {
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
 
-
+    public void changeTier(int userTier) {
+        this.userTier = userTier;
+    }
 }

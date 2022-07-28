@@ -244,7 +244,7 @@ public class CheckServiceImpl implements CheckService {
 
         // repository에 리스트 전달하여 (in query) status:ACTIVE user와 term 땡겨옴
         // 가져온거랑 리스트 개수 비교 -> 안맞으면 request로 들어온 값에 대해 없으므로 exception throw
-        List<Users> users = userRepository.selectUsersBySet(userIdSet);
+        List<Users> users = userRepository.selectUsersIn(userIdSet);
         if (users.size() != userIdSet.size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 userId가 존재합니다.");
         }

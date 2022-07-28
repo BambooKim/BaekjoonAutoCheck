@@ -67,4 +67,26 @@ public class UserResponseDto {
                     .build();
         }
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @ToString
+    public static class Tier {
+
+        private Long id;
+        private String korName;
+        private int userTier;
+        private String bojId;
+
+        public static Tier of(Users user) {
+            return Tier.builder()
+                    .id(user.getId())
+                    .korName(user.getKorName())
+                    .userTier(user.getUserTier())
+                    .bojId(user.getBojId())
+                    .build();
+        }
+    }
 }

@@ -1,9 +1,11 @@
 package com.bamboo.baekjoon.domain.user.service;
 
 import com.bamboo.baekjoon.domain.user.UserStatus;
+import com.bamboo.baekjoon.domain.user.UserTierHistory;
 import com.bamboo.baekjoon.domain.user.Users;
 import com.bamboo.baekjoon.domain.user.dto.UserRequestDto;
 import com.bamboo.baekjoon.domain.user.dto.UserResponseDto;
+import com.bamboo.baekjoon.domain.user.repository.TierHistoryRepository;
 import com.bamboo.baekjoon.domain.user.repository.UserRepository;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -16,6 +18,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -23,6 +27,7 @@ import java.time.LocalDateTime;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final TierHistoryRepository tierHistoryRepository;
 
     @Override
     public UserResponseDto.Creation createUser(UserRequestDto.Creation createUserData) {
@@ -45,9 +50,47 @@ public class UserServiceImpl implements UserService {
                 .joinedAt(LocalDateTime.now())
                 .build();
 
+        UserTierHistory tierHistory = UserTierHistory.builder()
+                .beforeTier(0)
+                .afterTier(userTier)
+                .user(user)
+                .build();
+
         userRepository.save(user);
+        tierHistoryRepository.save(tierHistory);
 
         return UserResponseDto.Creation.of(user);
+    }
+
+    @Override
+    public List<UserResponseDto.Tier> updateUserTier(List<Long> userIdList) {
+        List<Users> users;
+
+        if (userIdList.isEmpty())
+            users = userRepository.findAllByStatusIs(UserStatus.ACTIVE);
+        else
+            users = userRepository.selectUsersIn(userIdList);
+
+        List<UserResponseDto.Tier> response = new ArrayList<>();
+        users.forEach(user -> {
+            JsonElement element = getUserInformationByJsonElement(user.getBojId());
+            int newUserTier = retrieveUserTier(element);
+
+            // 변동이 있을 때만
+            if (newUserTier != user.getUserTier()) {
+                UserTierHistory tierHistory = UserTierHistory.builder()
+                        .beforeTier(user.getUserTier())
+                        .afterTier(newUserTier)
+                        .user(user)
+                        .build();
+                tierHistoryRepository.save(tierHistory);
+                user.changeTier(newUserTier);
+
+                response.add(UserResponseDto.Tier.of(user));
+            }
+        });
+
+        return response;
     }
 
     private void validateDuplicateUser(String bojId) {
