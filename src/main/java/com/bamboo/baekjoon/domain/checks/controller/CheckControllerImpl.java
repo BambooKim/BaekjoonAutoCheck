@@ -54,6 +54,14 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PostMapping("/check/term")
+    public ResponseEntity<List<CheckResponseDto.Simple>> createCheckBySingleTerm(@RequestParam(value = "id") Long termId,
+                                                                                 @RequestBody List<Long> userIdList) {
+        List<CheckResponseDto.Simple> response = checkService.createCheckBySingleTerm(termId, userIdList);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
     @GetMapping("/check/{id}")
     public ResponseEntity<CheckResponseDto.Simple> searchCheckSimpleById(@PathVariable("id") Long id) {
         CheckResponseDto.Simple response = checkService.findCheckSimpleById(id);

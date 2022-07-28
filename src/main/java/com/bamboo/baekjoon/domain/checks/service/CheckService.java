@@ -33,4 +33,6 @@ public interface CheckService {
     List<CheckResponseDto.AfterRun> runCheckByTerm(List<Long> termIdList);
 
     List<CheckResponseDto.AfterRun> runCheckByUser(List<Long> userIdList);
+
+    List<CheckResponseDto.Simple> createCheckBySingleTerm(Long termId, List<Long> userIdList);
 }

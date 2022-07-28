@@ -16,6 +16,7 @@ public interface CheckController {
     ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByTerm(List<Long> termIdList);
     ResponseEntity<CheckResponseDto.Simple> createCheck(CheckRequestDto.Create requestDto);
     ResponseEntity<List<CheckResponseDto.Simple>> createChecks(CheckRequestDto.CreateList requestList);
+    ResponseEntity<List<CheckResponseDto.Simple>> createCheckBySingleTerm(Long termId, List<Long> userIdList);
     ResponseEntity<CheckResponseDto.Simple> searchCheckSimpleById(Long id);
     ResponseEntity<Page<CheckResponseDto.Simple>> getCheckSimpleAll(Pageable pageable);
     ResponseEntity<CheckResponseDto.Detail> searchCheckDetailById(Long id);

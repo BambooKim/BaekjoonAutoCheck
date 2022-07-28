@@ -276,6 +276,34 @@ public class CheckServiceImpl implements CheckService {
     }
 
     @Override
+    public List<CheckResponseDto.Simple> createCheckBySingleTerm(Long termId, List<Long> userIdList) {
+        Term findTerm = termRepository.findById(termId).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Term을 찾을 수 없습니다.");
+        });
+
+        List<Users> findUsers;
+        if (userIdList.isEmpty())
+            findUsers = userRepository.findAllByStatusIs(UserStatus.ACTIVE);
+        else
+            findUsers = userRepository.selectUsersIn(userIdList);
+
+        List<CheckResponseDto.Simple> responseList = new ArrayList<>();
+        findUsers.forEach(user -> {
+            Checks check = Checks.builder()
+                    .status(CheckStatus.PENDING)
+                    .success(false)
+                    .user(user)
+                    .term(findTerm)
+                    .build();
+            checkRepository.save(check);
+
+            responseList.add(CheckResponseDto.Simple.of(check));
+        });
+
+        return responseList;
+    }
+
+    @Override
     public CheckResponseDto.Simple findCheckSimpleById(Long id) {
         Checks findCheck = checkRepository.findById(id).orElseThrow(() -> {
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Check가 존재하지 않습니다.");
