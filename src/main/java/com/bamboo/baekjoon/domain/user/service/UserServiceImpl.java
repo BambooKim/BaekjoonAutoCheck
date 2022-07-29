@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         tierHistoryRepository.save(tierHistory);
 
-        // TODO: 현재 날짜에 따라 Season 정보 받아와 넣어 줘야 함
+        // TODO: Season 선택하게 하여.. 다시말해 Season Id를 받아서 넣어야 함
         AccumRank accumRank = AccumRank.builder()
                 .scoreTotal(0)
                 .scoreChallenge(0)

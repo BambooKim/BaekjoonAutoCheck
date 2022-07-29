@@ -30,12 +30,11 @@ public class TermServiceImpl implements TermService {
         Season season = seasonRepository.findById(requestDto.getSeasonId()).orElseThrow(() -> {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Season이 존재하지 않습니다.");
         });
-        Term term = Term.builder().startAt(requestDto.getStartAt())
-                .endAt(requestDto.getEndAt()).season(season).build();
-
         // startAt, endAt 비교
         validateDateTime(requestDto);
 
+        Term term = Term.builder().startAt(requestDto.getStartAt())
+                .endAt(requestDto.getEndAt()).season(season).build();
         termRepository.save(term);
 
         return TermResponseDto.of(term);
