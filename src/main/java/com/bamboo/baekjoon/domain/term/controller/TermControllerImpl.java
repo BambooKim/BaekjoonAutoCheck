@@ -19,6 +19,8 @@ public class TermControllerImpl implements TermController {
 
     private final TermService termService;
 
+    // TODO: Season 추가 반영
+
     @PostMapping("/term")
     public ResponseEntity<TermResponseDto> createTerm(@Valid @RequestBody TermRequestDto requestDto) {
         TermResponseDto response = termService.createTerm(requestDto);

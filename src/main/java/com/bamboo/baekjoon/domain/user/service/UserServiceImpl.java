@@ -1,5 +1,7 @@
 package com.bamboo.baekjoon.domain.user.service;
 
+import com.bamboo.baekjoon.domain.rank.AccumRank;
+import com.bamboo.baekjoon.domain.rank.repository.AccumRankRepository;
 import com.bamboo.baekjoon.domain.user.UserStatus;
 import com.bamboo.baekjoon.domain.user.UserTierHistory;
 import com.bamboo.baekjoon.domain.user.Users;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final TierHistoryRepository tierHistoryRepository;
+    private final AccumRankRepository accumRankRepository;
 
     @Override
     public UserResponseDto.Creation createUser(UserRequestDto.Creation createUserData) {
@@ -51,15 +54,24 @@ public class UserServiceImpl implements UserService {
                 .status(UserStatus.ACTIVE)
                 .joinedAt(LocalDateTime.now())
                 .build();
+        userRepository.save(user);
 
         UserTierHistory tierHistory = UserTierHistory.builder()
                 .beforeTier(0)
                 .afterTier(userTier)
                 .user(user)
                 .build();
-
-        userRepository.save(user);
         tierHistoryRepository.save(tierHistory);
+
+        // TODO: 현재 날짜에 따라 Season 정보 받아와 넣어 줘야 함
+        AccumRank accumRank = AccumRank.builder()
+                .scoreTotal(0)
+                .scoreChallenge(0)
+                .scoreFail(0)
+                .user(user)
+                .season(null)
+                .build();
+        accumRankRepository.save(accumRank);
 
         return UserResponseDto.Creation.of(user);
     }

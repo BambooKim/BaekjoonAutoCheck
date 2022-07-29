@@ -1,5 +1,6 @@
 package com.bamboo.baekjoon.domain.checks.repository;
 
+import com.bamboo.baekjoon.domain.checks.CheckStatus;
 import com.bamboo.baekjoon.domain.checks.Checks;
 import com.bamboo.baekjoon.domain.term.Term;
 import com.bamboo.baekjoon.domain.user.Users;
@@ -17,9 +18,11 @@ import java.util.Optional;
 
 public interface CheckRepository extends JpaRepository<Checks, Long> {
 
+    @EntityGraph(attributePaths = {"user", "checkHistoryList"})
+    List<Checks> findByStatusIsAndTermIn(CheckStatus status, List<Term> terms);
 
     @Query("select c from Checks c join fetch c.user join fetch c.term where c.term.id in :termIdList and c.status = 'PENDING'")
-    List<Checks> findByTermIn(@Param("termIdList") List<Long> termIdList);
+    List<Checks> findByStatusIsActiveAndTermIn(@Param("termIdList") List<Long> termIdList);
 
     @Query("select c from Checks c join fetch c.user join fetch c.term where c.user.id in :userIdList and c.status = 'PENDING'")
     List<Checks> findByUserIn(@Param("userIdList") List<Long> userIdList);

@@ -4,6 +4,7 @@ import com.bamboo.baekjoon.domain.BaseTimeEntity;
 import com.bamboo.baekjoon.domain.term.Term;
 import com.bamboo.baekjoon.domain.user.Users;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -32,6 +33,9 @@ public class Checks extends BaseTimeEntity {
     @Column(nullable = true)
     private LocalDateTime runAt;
 
+    @Column
+    private boolean rankApplied;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
@@ -40,6 +44,7 @@ public class Checks extends BaseTimeEntity {
     @JoinColumn(name = "term_id", nullable = false)
     private Term term;
 
+    @BatchSize(size = 1000)
     @OneToMany(mappedBy = "check")
     private List<CheckHistory> checkHistoryList = new ArrayList<>();
 
@@ -51,12 +56,17 @@ public class Checks extends BaseTimeEntity {
         term.getChecks().add(this);
     }
 
+    public void completeRankApply() {
+        this.rankApplied = true;
+    }
+
     @Builder
     public Checks(CheckStatus status, boolean success, FailureReason reason, Users user) {
         this.status = status;
         this.success = success;
         this.reason = reason;
         this.user = user;
+        this.rankApplied = false;
     }
 
     @Override

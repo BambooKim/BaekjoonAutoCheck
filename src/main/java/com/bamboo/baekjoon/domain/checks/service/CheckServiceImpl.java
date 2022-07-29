@@ -51,7 +51,7 @@ public class CheckServiceImpl implements CheckService {
     @Override
     public List<CheckResponseDto.AfterRun> runCheckByTerm(List<Long> termIdList) {
 
-        return runCheckActual(checkRepository.findByTermIn(termIdList));
+        return runCheckActual(checkRepository.findByStatusIsActiveAndTermIn(termIdList));
     }
 
     @Override

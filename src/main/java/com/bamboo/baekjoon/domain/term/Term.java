@@ -2,6 +2,7 @@ package com.bamboo.baekjoon.domain.term;
 
 import com.bamboo.baekjoon.domain.BaseTimeEntity;
 import com.bamboo.baekjoon.domain.checks.Checks;
+import com.bamboo.baekjoon.domain.season.Season;
 import com.bamboo.baekjoon.domain.term.dto.TermRequestDto;
 import lombok.*;
 
@@ -25,10 +26,12 @@ public class Term extends BaseTimeEntity {
     @Column(name = "end_at", nullable = false)
     private LocalDateTime endAt;
 
-    private boolean rankApplied;
-
     @OneToMany(mappedBy = "term")
     private List<Checks> checks = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "season_id")
+    private Season season;
 
     public void changeTerm(TermRequestDto requestDto) {
         this.startAt = requestDto.getStartAt();
@@ -36,10 +39,10 @@ public class Term extends BaseTimeEntity {
     }
 
     @Builder
-    public Term(LocalDateTime startAt, LocalDateTime endAt, boolean rankApplied) {
+    public Term(LocalDateTime startAt, LocalDateTime endAt, Season season) {
         this.startAt = startAt;
         this.endAt = endAt;
-        this.rankApplied = rankApplied;
+        this.season = season;
     }
 
     @Override
@@ -48,7 +51,6 @@ public class Term extends BaseTimeEntity {
                 "id=" + id +
                 ", startAt=" + startAt +
                 ", endAt=" + endAt +
-                ", rankApplied=" + rankApplied +
                 ", checks=" + checks.size() +
                 '}';
     }
