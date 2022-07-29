@@ -4,6 +4,7 @@ import com.bamboo.baekjoon.domain.checks.CheckStatus;
 import com.bamboo.baekjoon.domain.checks.Checks;
 import com.bamboo.baekjoon.domain.checks.repository.CheckRepository;
 import com.bamboo.baekjoon.domain.rank.AccumRank;
+import com.bamboo.baekjoon.domain.rank.dto.RankResponseDto;
 import com.bamboo.baekjoon.domain.rank.repository.AccumRankRepository;
 import com.bamboo.baekjoon.domain.season.Season;
 import com.bamboo.baekjoon.domain.season.repository.SeasonRepository;
@@ -11,6 +12,8 @@ import com.bamboo.baekjoon.domain.term.Term;
 import com.bamboo.baekjoon.domain.term.repository.TermRepository;
 import com.bamboo.baekjoon.domain.user.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,5 +69,14 @@ public class RankServiceImpl implements RankService {
 
             findCheck.completeRankApply();
         }
+    }
+
+    @Override
+    public Page<RankResponseDto.Score> getAccumRankByScore(Long seasonId, Pageable pageable) {
+        Season findSeason = seasonRepository.findById(seasonId).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Season이 존재하지 않습니다.");
+        });
+
+        return accumRankRepository.findPagesBySeasonIs(findSeason, pageable).map(RankResponseDto.Score::of);
     }
 }
