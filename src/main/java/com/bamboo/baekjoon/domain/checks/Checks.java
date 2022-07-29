@@ -7,12 +7,12 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Getter
-@Builder
 public class Checks extends BaseTimeEntity {
 
     @Id @GeneratedValue
@@ -39,6 +39,25 @@ public class Checks extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "term_id", nullable = false)
     private Term term;
+
+    @OneToMany(mappedBy = "check")
+    private List<CheckHistory> checkHistoryList = new ArrayList<>();
+
+    public void setTerm(Term term) {
+        if (this.term != null)
+            this.term.getChecks().remove(this);
+
+        this.term = term;
+        term.getChecks().add(this);
+    }
+
+    @Builder
+    public Checks(CheckStatus status, boolean success, FailureReason reason, Users user) {
+        this.status = status;
+        this.success = success;
+        this.reason = reason;
+        this.user = user;
+    }
 
     @Override
     public String toString() {

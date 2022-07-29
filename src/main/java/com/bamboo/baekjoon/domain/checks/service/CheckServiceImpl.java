@@ -154,7 +154,8 @@ public class CheckServiceImpl implements CheckService {
                                 if (user.getEnterYear() == 2022) {
                                     CheckHistory history = CheckHistory.builder()
                                             .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
-                                            .check(check).build();
+                                            .build();
+                                    history.setCheck(check);
                                     chkHistoryRepository.save(history);
 
                                     check.admitCheck();
@@ -162,7 +163,8 @@ public class CheckServiceImpl implements CheckService {
                                     if (probTier > (user.getUserTier() - 5)) {
                                         CheckHistory history = CheckHistory.builder()
                                                 .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
-                                                .check(check).build();
+                                                .build();
+                                        history.setCheck(check);
                                         chkHistoryRepository.save(history);
 
                                         check.admitCheck();
@@ -223,9 +225,8 @@ public class CheckServiceImpl implements CheckService {
                 .status(CheckStatus.PENDING)
                 .success(false)
                 .user(findUser)
-                .term(findTerm)
                 .build();
-
+        check.setTerm(findTerm);
         checkRepository.save(check);
 
         return CheckResponseDto.Simple.of(check);
@@ -265,8 +266,8 @@ public class CheckServiceImpl implements CheckService {
                     .status(CheckStatus.PENDING)
                     .success(false)
                     .user(userMap.get(request.getUserId()))
-                    .term(termMap.get(request.getTermId()))
                     .build();
+            check.setTerm(termMap.get(request.getTermId()));
             checkRepository.save(check);
 
             responseList.add(CheckResponseDto.Simple.of(check));
@@ -293,8 +294,8 @@ public class CheckServiceImpl implements CheckService {
                     .status(CheckStatus.PENDING)
                     .success(false)
                     .user(user)
-                    .term(findTerm)
                     .build();
+            check.setTerm(findTerm);
             checkRepository.save(check);
 
             responseList.add(CheckResponseDto.Simple.of(check));

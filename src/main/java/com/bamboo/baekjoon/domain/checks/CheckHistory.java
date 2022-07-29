@@ -8,9 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Getter
-@Builder
 public class CheckHistory extends BaseTimeEntity {
 
     @Id @GeneratedValue
@@ -29,6 +27,21 @@ public class CheckHistory extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "check_id", nullable = false)
     private Checks check;
+
+    @Builder
+    public CheckHistory(int probNo, int probTier, LocalDateTime solvedAt) {
+        this.probNo = probNo;
+        this.probTier = probTier;
+        this.solvedAt = solvedAt;
+    }
+
+    public void setCheck(Checks check) {
+        if (this.check != null)
+            this.check.getCheckHistoryList().remove(this);
+
+        this.check = check;
+        check.getCheckHistoryList().add(this);
+    }
 
     @Override
     public String toString() {
