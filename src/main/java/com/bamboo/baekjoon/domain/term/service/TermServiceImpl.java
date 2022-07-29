@@ -1,5 +1,7 @@
 package com.bamboo.baekjoon.domain.term.service;
 
+import com.bamboo.baekjoon.domain.season.Season;
+import com.bamboo.baekjoon.domain.season.repository.SeasonRepository;
 import com.bamboo.baekjoon.domain.term.Term;
 import com.bamboo.baekjoon.domain.term.dto.TermRequestDto;
 
@@ -13,17 +15,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class TermServiceImpl implements TermService {
 
     private final TermRepository termRepository;
+    private final SeasonRepository seasonRepository;
 
     @Override
     public TermResponseDto createTerm(TermRequestDto requestDto) {
+        Season season = seasonRepository.findById(requestDto.getSeasonId()).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Season이 존재하지 않습니다.");
+        });
         Term term = Term.builder().startAt(requestDto.getStartAt())
-                .endAt(requestDto.getEndAt()).build();
+                .endAt(requestDto.getEndAt()).season(season).build();
 
         // startAt, endAt 비교
         validateDateTime(requestDto);
@@ -43,8 +51,11 @@ public class TermServiceImpl implements TermService {
     }
 
     @Override
-    public Page<TermResponseDto> getTermAll(Pageable pageable) {
-        return termRepository.findAll(pageable).map(m -> TermResponseDto.builder()
+    public Page<TermResponseDto> getTermAll(Long seasonId, Pageable pageable) {
+        Season season = seasonRepository.findById(seasonId).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Season이 존재하지 않습니다.");
+        });
+        return termRepository.findAllBySeasonIs(season, pageable).map(m -> TermResponseDto.builder()
                 .id(m.getId())
                 .startAt(m.getStartAt())
                 .endAt(m.getEndAt()).build());
@@ -56,9 +67,16 @@ public class TermServiceImpl implements TermService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Term이 존재하지 않습니다.");
         });
 
+        if (!Objects.equals(findTerm.getSeason().getId(), requestDto.getSeasonId())) {
+            Season findSeason = seasonRepository.findById(requestDto.getSeasonId()).orElseThrow(() -> {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Season이 존재하지 않습니다.");
+            });
+            findTerm.changeSeason(findSeason);
+        }
+
         validateDateTime(requestDto);
 
-        findTerm.changeTerm(requestDto);
+        findTerm.changePeriod(requestDto);
 
         return TermResponseDto.of(findTerm);
     }

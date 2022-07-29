@@ -33,9 +33,13 @@ public class Term extends BaseTimeEntity {
     @JoinColumn(name = "season_id")
     private Season season;
 
-    public void changeTerm(TermRequestDto requestDto) {
+    public void changePeriod(TermRequestDto requestDto) {
         this.startAt = requestDto.getStartAt();
         this.endAt = requestDto.getEndAt();
+    }
+
+    public void changeSeason(Season season) {
+        this.season = season;
     }
 
     @Builder

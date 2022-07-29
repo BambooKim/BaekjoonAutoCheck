@@ -19,8 +19,6 @@ public class TermControllerImpl implements TermController {
 
     private final TermService termService;
 
-    // TODO: Season 추가 반영
-
     @PostMapping("/term")
     public ResponseEntity<TermResponseDto> createTerm(@Valid @RequestBody TermRequestDto requestDto) {
         TermResponseDto response = termService.createTerm(requestDto);
@@ -36,8 +34,8 @@ public class TermControllerImpl implements TermController {
     }
 
     @GetMapping("/term")
-    public ResponseEntity<Page<TermResponseDto>> getTermAll(Pageable pageable) {
-        Page<TermResponseDto> response = termService.getTermAll(pageable);
+    public ResponseEntity<Page<TermResponseDto>> getTermAll(@RequestParam("seasonId") Long seasonId, Pageable pageable) {
+        Page<TermResponseDto> response = termService.getTermAll(seasonId, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

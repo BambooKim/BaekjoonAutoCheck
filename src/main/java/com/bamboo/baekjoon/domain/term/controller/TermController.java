@@ -10,7 +10,7 @@ public interface TermController {
 
     ResponseEntity<TermResponseDto> createTerm(TermRequestDto requestDto);
     ResponseEntity<TermResponseDto> searchTermById(Long id);
-    ResponseEntity<Page<TermResponseDto>> getTermAll(Pageable pageable);
+    ResponseEntity<Page<TermResponseDto>> getTermAll(Long seasonId, Pageable pageable);
     ResponseEntity<TermResponseDto> updateTerm(Long id, TermRequestDto requestDto);
     ResponseEntity<String> deleteTerm(Long id);
 

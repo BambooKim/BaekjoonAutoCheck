@@ -2,6 +2,8 @@ package com.bamboo.baekjoon.domain.term.repository;
 
 import com.bamboo.baekjoon.domain.season.Season;
 import com.bamboo.baekjoon.domain.term.Term;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +22,6 @@ public interface TermRepository extends JpaRepository<Term, Long> {
 
     @EntityGraph(attributePaths = {"checks"})
     List<Term> findBySeasonIs(Season season);
+
+    Page<Term> findAllBySeasonIs(Season season, Pageable pageable);
 }

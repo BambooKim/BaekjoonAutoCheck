@@ -10,7 +10,7 @@ public interface TermService {
 
     TermResponseDto findTermById(Long id);
 
-    Page<TermResponseDto> getTermAll(Pageable pageable);
+    Page<TermResponseDto> getTermAll(Long seasonId, Pageable pageable);
 
     TermResponseDto updateTerm(Long id, TermRequestDto requestDto);
 

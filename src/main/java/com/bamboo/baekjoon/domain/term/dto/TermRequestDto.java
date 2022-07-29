@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,6 +15,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class TermRequestDto {
+
+    @NotNull(message = "Season의 id를 입력해주세요.")
+    @Positive(message = "id는 양수입니다.")
+    private Long seasonId;
 
     @NotNull(message = "시작 날짜와 시간을 입력해주세요.")
     private LocalDateTime startAt;
