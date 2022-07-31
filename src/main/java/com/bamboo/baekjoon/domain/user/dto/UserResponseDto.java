@@ -1,7 +1,7 @@
 package com.bamboo.baekjoon.domain.user.dto;
 
 import com.bamboo.baekjoon.domain.user.UserStatus;
-import com.bamboo.baekjoon.domain.user.Users;
+import com.bamboo.baekjoon.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -25,7 +25,7 @@ public class UserResponseDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime joinedAt;
 
-        public static Creation of(Users user) {
+        public static Creation of(User user) {
             return Creation.builder()
                     .id(user.getId())
                     .korName(user.getKorName())
@@ -55,7 +55,7 @@ public class UserResponseDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime joinedAt;
 
-        public static Info of(Users user) {
+        public static Info of(User user) {
             return Info.builder()
                     .id(user.getId())
                     .korName(user.getKorName())
@@ -80,7 +80,7 @@ public class UserResponseDto {
         private int userTier;
         private String bojId;
 
-        public static Tier of(Users user) {
+        public static Tier of(User user) {
             return Tier.builder()
                     .id(user.getId())
                     .korName(user.getKorName())
@@ -101,7 +101,7 @@ public class UserResponseDto {
         private String korName;
         private UserStatus status;
 
-        public static Status of(Users user) {
+        public static Status of(User user) {
             return Status.builder()
                     .id(user.getId())
                     .korName(user.getKorName())

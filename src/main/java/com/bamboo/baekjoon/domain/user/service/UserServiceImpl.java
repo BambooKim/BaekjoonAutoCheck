@@ -4,7 +4,7 @@ import com.bamboo.baekjoon.domain.rank.AccumRank;
 import com.bamboo.baekjoon.domain.rank.repository.AccumRankRepository;
 import com.bamboo.baekjoon.domain.user.UserStatus;
 import com.bamboo.baekjoon.domain.user.UserTierHistory;
-import com.bamboo.baekjoon.domain.user.Users;
+import com.bamboo.baekjoon.domain.user.User;
 import com.bamboo.baekjoon.domain.user.dto.UserRequestDto;
 import com.bamboo.baekjoon.domain.user.dto.UserResponseDto;
 import com.bamboo.baekjoon.domain.user.repository.TierHistoryRepository;
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
 
         int userTier = retrieveUserTier(element);
 
-        Users user = Users.builder()
+        User user = User.builder()
                 .korName(createUserData.getKorName())
                 .userTier(userTier)
                 .enterYear(createUserData.getEnterYear())
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDto.Tier> updateUserTier(List<Long> userIdList) {
-        List<Users> users;
+        List<User> users;
 
         if (userIdList.isEmpty())
             users = userRepository.findAllByStatusIs(UserStatus.ACTIVE);
@@ -112,12 +112,12 @@ public class UserServiceImpl implements UserService {
         List<Long> userIdList = new ArrayList<>();
         list.forEach(item -> userIdList.add(item.getUserId()));
 
-        Map<Long, Users> userMap = new HashMap<>();
+        Map<Long, User> userMap = new HashMap<>();
         userRepository.findAllById(userIdList).forEach(user -> userMap.put(user.getId(), user));
 
         List<UserResponseDto.Status> response = new ArrayList<>();
         list.forEach(item -> {
-            Users user = userMap.get(item.getUserId());
+            User user = userMap.get(item.getUserId());
             user.changeStatus(item.getStatus());
 
             response.add(UserResponseDto.Status.of(user));

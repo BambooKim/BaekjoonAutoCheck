@@ -2,7 +2,7 @@ package com.bamboo.baekjoon.domain.checks;
 
 import com.bamboo.baekjoon.domain.BaseTimeEntity;
 import com.bamboo.baekjoon.domain.term.Term;
-import com.bamboo.baekjoon.domain.user.Users;
+import com.bamboo.baekjoon.domain.user.User;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
@@ -38,7 +38,7 @@ public class Checks extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "term_id", nullable = false)
@@ -61,7 +61,7 @@ public class Checks extends BaseTimeEntity {
     }
 
     @Builder
-    public Checks(CheckStatus status, boolean success, FailureReason reason, Users user) {
+    public Checks(CheckStatus status, boolean success, FailureReason reason, User user) {
         this.status = status;
         this.success = success;
         this.reason = reason;

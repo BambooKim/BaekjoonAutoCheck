@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @ToString
-public class Users {
+@Table(name = "USERS")
+public class User {
 
     @Id @GeneratedValue
     @Column(name = "user_id")

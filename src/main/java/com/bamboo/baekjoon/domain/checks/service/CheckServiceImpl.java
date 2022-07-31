@@ -11,7 +11,7 @@ import com.bamboo.baekjoon.domain.checks.repository.ChkHistoryRepository;
 import com.bamboo.baekjoon.domain.term.Term;
 import com.bamboo.baekjoon.domain.term.repository.TermRepository;
 import com.bamboo.baekjoon.domain.user.UserStatus;
-import com.bamboo.baekjoon.domain.user.Users;
+import com.bamboo.baekjoon.domain.user.User;
 import com.bamboo.baekjoon.domain.user.repository.UserRepository;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,7 @@ public class CheckServiceImpl implements CheckService {
     }
 
     public List<CheckResponseDto.AfterRun> runCheckActual(List<Checks> findCheckList) {
-        Map<Users, List<Checks>> usersChecksListMap = new HashMap<>();
+        Map<User, List<Checks>> usersChecksListMap = new HashMap<>();
 
         LocalDateTime oldestStartAt = LocalDateTime.MAX;
 
@@ -209,7 +209,7 @@ public class CheckServiceImpl implements CheckService {
 
     @Override
     public CheckResponseDto.Simple createCheck(CheckRequestDto.Create requestDto) {
-        Users findUser = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> {
+        User findUser = userRepository.findById(requestDto.getUserId()).orElseThrow(() -> {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다.");
         });
 
@@ -245,7 +245,7 @@ public class CheckServiceImpl implements CheckService {
 
         // repository에 리스트 전달하여 (in query) status:ACTIVE user와 term 땡겨옴
         // 가져온거랑 리스트 개수 비교 -> 안맞으면 request로 들어온 값에 대해 없으므로 exception throw
-        List<Users> users = userRepository.selectUsersIn(userIdSet);
+        List<User> users = userRepository.selectUsersIn(userIdSet);
         if (users.size() != userIdSet.size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 userId가 존재합니다.");
         }
@@ -256,7 +256,7 @@ public class CheckServiceImpl implements CheckService {
         }
 
         // 땡겨온 애들은 아래에서 활용하기 위해 Map으로 변환 (key:id로 접근하기 위해)
-        Map<Long, Users> userMap = users.stream().collect(Collectors.toMap(Users::getId, user -> user, (a, b) -> b));
+        Map<Long, User> userMap = users.stream().collect(Collectors.toMap(User::getId, user -> user, (a, b) -> b));
         Map<Long, Term> termMap = terms.stream().collect(Collectors.toMap(Term::getId, term -> term, (a, b) -> b));
 
         // requestList iter하면서 Check 생성 후 repository save -> response entity 생성 후 List add
@@ -282,7 +282,7 @@ public class CheckServiceImpl implements CheckService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Term을 찾을 수 없습니다.");
         });
 
-        List<Users> findUsers;
+        List<User> findUsers;
         if (userIdList.isEmpty())
             findUsers = userRepository.findAllByStatusIs(UserStatus.ACTIVE);
         else
@@ -345,7 +345,7 @@ public class CheckServiceImpl implements CheckService {
                 return checkRepository.findByTermIn(terms, pageable).map(CheckResponseDto.Detail::of);
             }
         } else {
-            List<Users> users = userRepository.findAllById(userIdList);
+            List<User> users = userRepository.findAllById(userIdList);
 
             if (termIdList == null) {           // user O, term X -> user 별로 묶어야 함!
                 return checkRepository.findByUserIn(users, pageable).map(CheckResponseDto.Detail::of);

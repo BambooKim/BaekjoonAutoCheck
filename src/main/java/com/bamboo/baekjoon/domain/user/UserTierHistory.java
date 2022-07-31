@@ -18,7 +18,7 @@ public class UserTierHistory extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users user;
+    private User user;
 
     private int beforeTier;
     private int afterTier;

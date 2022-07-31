@@ -2,7 +2,7 @@ package com.bamboo.baekjoon.domain.rank;
 
 import com.bamboo.baekjoon.domain.BaseTimeEntity;
 import com.bamboo.baekjoon.domain.season.Season;
-import com.bamboo.baekjoon.domain.user.Users;
+import com.bamboo.baekjoon.domain.user.User;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,7 +27,7 @@ public class AccumRank extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "season_id")
@@ -46,7 +46,7 @@ public class AccumRank extends BaseTimeEntity {
     }
 
     @Builder
-    public AccumRank(int scoreTotal, int scoreChallenge, int scoreFail, Users user, Season season) {
+    public AccumRank(int scoreTotal, int scoreChallenge, int scoreFail, User user, Season season) {
         this.scoreTotal = scoreTotal;
         this.scoreChallenge = scoreChallenge;
         this.scoreFail = scoreFail;

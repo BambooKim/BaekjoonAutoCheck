@@ -10,7 +10,7 @@ import com.bamboo.baekjoon.domain.season.Season;
 import com.bamboo.baekjoon.domain.season.repository.SeasonRepository;
 import com.bamboo.baekjoon.domain.term.Term;
 import com.bamboo.baekjoon.domain.term.repository.TermRepository;
-import com.bamboo.baekjoon.domain.user.Users;
+import com.bamboo.baekjoon.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,14 +42,14 @@ public class RankServiceImpl implements RankService {
         List<Term> findTerms = termRepository.findBySeasonIs(findSeason);
         List<Checks> findChecks = checkRepository.findByStatusIsAndTermIn(CheckStatus.COMPLETE, findTerms);
 
-        Map<Users, AccumRank> accumRankMap = new HashMap<>();
+        Map<User, AccumRank> accumRankMap = new HashMap<>();
         accumRankRepository.findBySeasonIs(findSeason).forEach(accumRank -> accumRankMap.put(accumRank.getUser(), accumRank));
 
         for (Checks findCheck : findChecks) {
             if (findCheck.isRankApplied())
                 continue;
 
-            Users user = findCheck.getUser();
+            User user = findCheck.getUser();
             AccumRank accumRank = accumRankMap.get(user);
 
             // 벌금왕 누적 랭킹 Update
