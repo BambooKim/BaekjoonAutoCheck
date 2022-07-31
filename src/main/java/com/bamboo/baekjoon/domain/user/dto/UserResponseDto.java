@@ -20,6 +20,7 @@ public class UserResponseDto {
         private int userTier;
         private int enterYear;
         private String bojId;
+        private String username;
         private UserStatus status;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
@@ -32,6 +33,7 @@ public class UserResponseDto {
                     .userTier(user.getUserTier())
                     .enterYear(user.getEnterYear())
                     .bojId(user.getBojId())
+                    .username(user.getUsername())
                     .status(user.getStatus())
                     .joinedAt(user.getJoinedAt())
                     .build();

@@ -25,6 +25,11 @@ public class UserRequestDto {
         @NotNull(message = "백준 아이디를 입력해주세요.")
         private String bojId;
 
+        @NotNull(message = "Username을 입력해주세요.")
+        private String username;
+
+        private String password;
+
     }
 
     @Getter

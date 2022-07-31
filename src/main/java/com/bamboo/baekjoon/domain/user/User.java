@@ -27,12 +27,22 @@ public class User {
     @Column(name = "enter_year", nullable = false)
     private int enterYear;
 
-    @Column(name = "boj_id", length = 64, nullable = false, unique = true)
+    @Column(name = "boj_id", length = 64, nullable = false)
     private String bojId;
+
+    @Column(name = "username", length = 50, unique = true)
+    private String username;
+
+    @Column(name = "password", length = 100)
+    private String password;
 
     @Column(name = "user_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
+    @Column
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
 
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
