@@ -2,6 +2,7 @@ package com.bamboo.baekjoon.domain.user.service;
 
 import com.bamboo.baekjoon.domain.rank.AccumRank;
 import com.bamboo.baekjoon.domain.rank.repository.AccumRankRepository;
+import com.bamboo.baekjoon.domain.user.Role;
 import com.bamboo.baekjoon.domain.user.UserStatus;
 import com.bamboo.baekjoon.domain.user.UserTierHistory;
 import com.bamboo.baekjoon.domain.user.User;
@@ -9,11 +10,21 @@ import com.bamboo.baekjoon.domain.user.dto.UserRequestDto;
 import com.bamboo.baekjoon.domain.user.dto.UserResponseDto;
 import com.bamboo.baekjoon.domain.user.repository.TierHistoryRepository;
 import com.bamboo.baekjoon.domain.user.repository.UserRepository;
+import com.bamboo.baekjoon.global.config.security.JwtFilter;
+import com.bamboo.baekjoon.global.config.security.Token;
+import com.bamboo.baekjoon.global.config.security.TokenService;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,10 +45,14 @@ public class UserServiceImpl implements UserService {
     private final TierHistoryRepository tierHistoryRepository;
     private final AccumRankRepository accumRankRepository;
 
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final TokenService tokenService;
+
     @Override
     public UserResponseDto.Creation createUser(UserRequestDto.Creation createUserData) {
 
-        validateDuplicateUser(createUserData.getBojId());
+        validateDuplicateUser(createUserData.getBojId(), createUserData.getUsername());
 
         JsonElement element = getUserInformationByJsonElement(createUserData.getBojId());
 
@@ -51,6 +66,9 @@ public class UserServiceImpl implements UserService {
                 .userTier(userTier)
                 .enterYear(createUserData.getEnterYear())
                 .bojId(createUserData.getBojId())
+                .username(createUserData.getUsername())
+                .password(passwordEncoder.encode(createUserData.getPassword()))
+                .role(Role.USER)
                 .status(UserStatus.ACTIVE)
                 .joinedAt(LocalDateTime.now())
                 .build();
@@ -126,11 +144,36 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
-    private void validateDuplicateUser(String bojId) {
+    @Override
+    public ResponseEntity<?> login(Token.Request request) {
+        User user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "없는 사용자입니다.");
+        });
+
+        UsernamePasswordAuthenticationToken authenticationToken
+                = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+
+        Authentication authentication
+                = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwt = tokenService.generateToken(user.getId().toString(), user.getRole().toString());
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+
+        return new ResponseEntity<>(Token.Response.of(jwt), httpHeaders, HttpStatus.OK);
+    }
+
+    private void validateDuplicateUser(String bojId, String username) {
         userRepository.findByBojId(bojId)
                 .ifPresent(m -> {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 사용중인 ID입니다.");
                 });
+
+        if (userRepository.findByUsername(username).isPresent())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 User Id입니다.");
     }
 
     private int retrieveUserTier(JsonElement element) {
