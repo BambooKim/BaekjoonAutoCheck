@@ -19,42 +19,42 @@ public class CheckControllerImpl implements CheckController {
 
     private final CheckService checkService;
 
-    @PostMapping("/check/runByUser")
+    @PostMapping("/admin/check/runByUser")
     public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByUser(@RequestBody List<Long> userIdList) {
         List<CheckResponseDto.AfterRun> response = checkService.runCheckByUser(userIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/check/runByTerm")
+    @PostMapping("/admin/check/runByTerm")
     public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByTerm(@RequestBody List<Long> termIdList) {
         List<CheckResponseDto.AfterRun> response = checkService.runCheckByTerm(termIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/check/runByCheck")
+    @PostMapping("/admin/check/runByCheck")
     public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckById(@RequestBody List<Long> checkIdList) {
         List<CheckResponseDto.AfterRun> response = checkService.runCheck(checkIdList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/check")
+    @PostMapping("/admin/check")
     public ResponseEntity<CheckResponseDto.Simple> createCheck(@RequestBody CheckRequestDto.Create requestDto) {
         CheckResponseDto.Simple response = checkService.createCheck(requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/check-multiple")
+    @PostMapping("/admin/check-multiple")
     public ResponseEntity<List<CheckResponseDto.Simple>> createChecks(@RequestBody CheckRequestDto.CreateList requestList) {
         List<CheckResponseDto.Simple> response = checkService.createChecks(requestList);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/check/term")
+    @PostMapping("/admin/check/term")
     public ResponseEntity<List<CheckResponseDto.Simple>> createCheckBySingleTerm(@RequestParam(value = "id") Long termId,
                                                                                  @RequestBody List<Long> userIdList) {
         List<CheckResponseDto.Simple> response = checkService.createCheckBySingleTerm(termId, userIdList);
@@ -100,7 +100,7 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/check/{id}")
+    @PutMapping("/admin/check/{id}")
     public ResponseEntity<CheckResponseDto.Detail> updateCheck(@PathVariable("id") Long id,
                                                                    @RequestBody CheckRequestDto.Update requestDto) {
         CheckResponseDto.Detail response = checkService.updateCheck(id, requestDto);
@@ -108,14 +108,14 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
-    @DeleteMapping("/check/{id}")
+    @DeleteMapping("/admin/check/{id}")
     public ResponseEntity<String> deleteCheck(@PathVariable("id") Long id) {
         String response = checkService.deleteById(id);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
-    @DeleteMapping("/check")
+    @DeleteMapping("/admin/check")
     public ResponseEntity<String> deleteChecks(@RequestParam(value = "id") List<Long> params) {
         String response = checkService.deleteByParams(params);
 

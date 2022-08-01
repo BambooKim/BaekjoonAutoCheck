@@ -18,7 +18,7 @@ public class SeasonControllerImpl implements SeasonController {
 
     private final SeasonService seasonService;
 
-    @PostMapping("/season")
+    @PostMapping("/admin/season")
     public ResponseEntity<SeasonResponseDto> createSeason(@RequestBody SeasonRequestDto requestDto) {
         SeasonResponseDto response = seasonService.createSeason(requestDto);
 

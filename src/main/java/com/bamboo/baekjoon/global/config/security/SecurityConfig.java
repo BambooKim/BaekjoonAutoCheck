@@ -42,7 +42,10 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeRequests()
-                .anyRequest().permitAll()
+                .antMatchers("/api/v1/signup").permitAll()
+                .antMatchers("/api/v1/login").permitAll()
+                .antMatchers("/api/v1/admin/**").hasAnyRole("ADMIN")
+                .anyRequest().hasAnyRole("ADMIN", "USER")
 
                 .and()
                 .apply(new JwtSecurityConfig(tokenService));

@@ -16,7 +16,7 @@ public class RankControllerImpl implements RankController {
 
     private final RankService rankService;
 
-    @PutMapping("/rank")
+    @PutMapping("/admin/rank")
     public String updateAccumRank(@RequestParam("seasonId") Long seasonId) {
         rankService.updateAccumRank(seasonId);
 

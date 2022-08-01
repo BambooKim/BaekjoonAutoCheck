@@ -19,7 +19,7 @@ public class TermControllerImpl implements TermController {
 
     private final TermService termService;
 
-    @PostMapping("/term")
+    @PostMapping("/admin/term")
     public ResponseEntity<TermResponseDto> createTerm(@Valid @RequestBody TermRequestDto requestDto) {
         TermResponseDto response = termService.createTerm(requestDto);
 
@@ -40,7 +40,7 @@ public class TermControllerImpl implements TermController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/term/{id}")
+    @PutMapping("/admin/term/{id}")
     public ResponseEntity<TermResponseDto> updateTerm(@PathVariable("id") Long id,
                                                         @Valid @RequestBody TermRequestDto requestDto) {
         TermResponseDto response = termService.updateTerm(id, requestDto);
@@ -48,7 +48,7 @@ public class TermControllerImpl implements TermController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
-    @DeleteMapping("/term/{id}")
+    @DeleteMapping("/admin/term/{id}")
     public ResponseEntity<String> deleteTerm(@PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(termService.deleteById(id));
     }

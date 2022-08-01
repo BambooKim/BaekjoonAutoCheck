@@ -31,14 +31,14 @@ public class UserControllerImpl implements UserController {
         return userService.login(request);
     }
 
-    @PutMapping("/user/status")
+    @PutMapping("/admin/user/status")
     public ResponseEntity<List<UserResponseDto.Status>> updateUserStatus(@Valid @RequestBody List<UserRequestDto.Status> list) {
         List<UserResponseDto.Status> response = userService.updateUserStatus(list);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
-    @PutMapping("/user/tier")
+    @PutMapping("/admin/user/tier")
     public ResponseEntity<List<UserResponseDto.Tier>> updateUserTier(@RequestBody List<Long> userIdList) {
         List<UserResponseDto.Tier> response = userService.updateUserTier(userIdList);
 
