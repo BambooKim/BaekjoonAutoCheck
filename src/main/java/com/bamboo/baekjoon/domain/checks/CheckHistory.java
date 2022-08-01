@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 public class CheckHistory extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "history_id")
     private Long id;
 

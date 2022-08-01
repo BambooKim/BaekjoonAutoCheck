@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Getter
 public class AccumRank extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "accum_rank_id")
     private Long id;
 

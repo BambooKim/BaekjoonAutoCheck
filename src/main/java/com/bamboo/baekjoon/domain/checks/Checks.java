@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 public class Checks extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "check_id")
     private Long id;
 

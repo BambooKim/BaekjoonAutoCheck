@@ -2,6 +2,7 @@ package com.bamboo.baekjoon.domain.user.service;
 
 import com.bamboo.baekjoon.domain.rank.AccumRank;
 import com.bamboo.baekjoon.domain.rank.repository.AccumRankRepository;
+import com.bamboo.baekjoon.domain.season.repository.SeasonRepository;
 import com.bamboo.baekjoon.domain.user.Role;
 import com.bamboo.baekjoon.domain.user.UserStatus;
 import com.bamboo.baekjoon.domain.user.UserTierHistory;
@@ -49,6 +50,8 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenService tokenService;
 
+    private final SeasonRepository seasonRepository;
+
     @Override
     public UserResponseDto.Creation createUser(UserRequestDto.Creation createUserData) {
 
@@ -87,7 +90,7 @@ public class UserServiceImpl implements UserService {
                 .scoreChallenge(0)
                 .scoreFail(0)
                 .user(user)
-                .season(null)
+                .season(seasonRepository.findById(1L).orElse(null))
                 .build();
         accumRankRepository.save(accumRank);
 

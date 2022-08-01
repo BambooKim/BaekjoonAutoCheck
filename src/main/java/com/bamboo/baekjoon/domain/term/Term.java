@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 public class Term extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "term_id")
     private Long id;
 

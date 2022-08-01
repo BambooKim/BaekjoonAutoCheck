@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Builder
 public class UserTierHistory extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tier_history_id")
     private Long id;
 

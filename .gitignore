@@ -1,3 +1,5 @@
+.secrets/
+
 ### Java template
 # Compiled class file
 *.class
@@ -141,3 +143,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+/secrets/
+/secrets/db_bamboo_password.txt
+/secrets/db_root_password.txt
+/baekjoon-mysql-volume/
