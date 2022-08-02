@@ -104,6 +104,7 @@ public class Checks extends BaseTimeEntity {
         this.status = CheckStatus.COMPLETE;
         this.success = true;
         this.runAt = LocalDateTime.now();
+        this.reason = null;
     }
 
     public void failCheck(FailureReason reason) {
