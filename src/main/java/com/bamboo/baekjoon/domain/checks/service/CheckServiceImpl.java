@@ -39,9 +39,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CheckServiceImpl implements CheckService {
 
-
-    // TODO: {userId, termId} 는 UNIQUE여야 함.
-
     private final UserRepository userRepository;
 
     private final TermRepository termRepository;
