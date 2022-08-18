@@ -10,11 +10,11 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Table(name = "accum_rank")
-public class AccumRank extends BaseTimeEntity {
+@Table(name = "\"rank\"")
+public class Rank extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "accum_rank_id")
+    @Column(name = "rank_id")
     private Long id;
 
     @Column(name = "score_total", nullable = false)
@@ -47,7 +47,7 @@ public class AccumRank extends BaseTimeEntity {
     }
 
     @Builder
-    public AccumRank(int scoreTotal, int scoreChallenge, int scoreFail, User user, Season season) {
+    public Rank(int scoreTotal, int scoreChallenge, int scoreFail, User user, Season season) {
         this.scoreTotal = scoreTotal;
         this.scoreChallenge = scoreChallenge;
         this.scoreFail = scoreFail;

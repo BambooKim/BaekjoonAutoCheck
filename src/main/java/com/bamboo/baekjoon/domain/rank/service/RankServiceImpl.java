@@ -3,9 +3,9 @@ package com.bamboo.baekjoon.domain.rank.service;
 import com.bamboo.baekjoon.domain.checks.CheckStatus;
 import com.bamboo.baekjoon.domain.checks.Checks;
 import com.bamboo.baekjoon.domain.checks.repository.CheckRepository;
-import com.bamboo.baekjoon.domain.rank.AccumRank;
+import com.bamboo.baekjoon.domain.rank.Rank;
 import com.bamboo.baekjoon.domain.rank.dto.RankResponseDto;
-import com.bamboo.baekjoon.domain.rank.repository.AccumRankRepository;
+import com.bamboo.baekjoon.domain.rank.repository.RankRepository;
 import com.bamboo.baekjoon.domain.season.Season;
 import com.bamboo.baekjoon.domain.season.repository.SeasonRepository;
 import com.bamboo.baekjoon.domain.term.Term;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class RankServiceImpl implements RankService {
 
     private final CheckRepository checkRepository;
-    private final AccumRankRepository accumRankRepository;
+    private final RankRepository rankRepository;
     private final TermRepository termRepository;
     private final SeasonRepository seasonRepository;
 
@@ -42,28 +42,28 @@ public class RankServiceImpl implements RankService {
         List<Term> findTerms = termRepository.findBySeasonIs(findSeason);
         List<Checks> findChecks = checkRepository.findByStatusIsAndTermIn(CheckStatus.COMPLETE, findTerms);
 
-        Map<User, AccumRank> accumRankMap = new HashMap<>();
-        accumRankRepository.findBySeasonIs(findSeason).forEach(accumRank -> accumRankMap.put(accumRank.getUser(), accumRank));
+        Map<User, Rank> accumRankMap = new HashMap<>();
+        rankRepository.findBySeasonIs(findSeason).forEach(accumRank -> accumRankMap.put(accumRank.getUser(), accumRank));
 
         for (Checks findCheck : findChecks) {
             if (findCheck.isRankApplied())
                 continue;
 
             User user = findCheck.getUser();
-            AccumRank accumRank = accumRankMap.get(user);
+            Rank rank = accumRankMap.get(user);
 
             // 벌금왕 누적 랭킹 Update
             if (!findCheck.isSuccess()) {
-                accumRank.addScoreFail(1);
+                rank.addScoreFail(1);
             }
 
             findCheck.getCheckHistoryList().forEach(history -> {
                 // 누적 랭킹 Update
-                accumRank.addScoreTotal(history.getProbTier());
+                rank.addScoreTotal(history.getProbTier());
 
                 // 도전왕 랭킹 Update
                 if (history.getProbTier() > user.getUserTier()) {
-                    accumRank.addScoreChallenge(history.getProbTier() - user.getUserTier());
+                    rank.addScoreChallenge(history.getProbTier() - user.getUserTier());
                 }
             });
 
@@ -77,6 +77,6 @@ public class RankServiceImpl implements RankService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Season이 존재하지 않습니다.");
         });
 
-        return accumRankRepository.findPagesBySeasonIs(findSeason, pageable).map(RankResponseDto.Score::of);
+        return rankRepository.findPagesBySeasonIs(findSeason, pageable).map(RankResponseDto.Score::of);
     }
 }

@@ -1,7 +1,6 @@
 package com.bamboo.baekjoon.domain.user.service;
 
-import com.bamboo.baekjoon.domain.rank.AccumRank;
-import com.bamboo.baekjoon.domain.rank.repository.AccumRankRepository;
+import com.bamboo.baekjoon.domain.rank.repository.RankRepository;
 import com.bamboo.baekjoon.domain.season.repository.SeasonRepository;
 import com.bamboo.baekjoon.domain.user.Role;
 import com.bamboo.baekjoon.domain.user.UserStatus;
@@ -44,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final TierHistoryRepository tierHistoryRepository;
-    private final AccumRankRepository accumRankRepository;
+    private final RankRepository rankRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -83,16 +82,6 @@ public class UserServiceImpl implements UserService {
                 .user(user)
                 .build();
         tierHistoryRepository.save(tierHistory);
-
-        // TODO: Season 선택하게 하여.. 다시말해 Season Id를 받아서 넣어야 함
-        AccumRank accumRank = AccumRank.builder()
-                .scoreTotal(0)
-                .scoreChallenge(0)
-                .scoreFail(0)
-                .user(user)
-                .season(seasonRepository.findById(1L).orElse(null))
-                .build();
-        accumRankRepository.save(accumRank);
 
         return UserResponseDto.Creation.of(user);
     }

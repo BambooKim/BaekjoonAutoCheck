@@ -1,6 +1,6 @@
 package com.bamboo.baekjoon.domain.rank.dto;
 
-import com.bamboo.baekjoon.domain.rank.AccumRank;
+import com.bamboo.baekjoon.domain.rank.Rank;
 import com.bamboo.baekjoon.domain.user.dto.UserResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,13 +21,13 @@ public class RankResponseDto {
         private int scoreFail;
         private UserResponseDto.Info userInfo;
 
-        public static Score of(AccumRank accumRank) {
+        public static Score of(Rank rank) {
             return Score.builder()
-                    .id(accumRank.getId())
-                    .scoreTotal(accumRank.getScoreTotal())
-                    .scoreChallenge(accumRank.getScoreChallenge())
-                    .scoreFail(accumRank.getScoreFail())
-                    .userInfo(UserResponseDto.Info.of(accumRank.getUser()))
+                    .id(rank.getId())
+                    .scoreTotal(rank.getScoreTotal())
+                    .scoreChallenge(rank.getScoreChallenge())
+                    .scoreFail(rank.getScoreFail())
+                    .userInfo(UserResponseDto.Info.of(rank.getUser()))
                     .build();
         }
     }

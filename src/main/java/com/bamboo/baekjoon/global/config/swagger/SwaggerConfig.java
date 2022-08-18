@@ -1,4 +1,4 @@
-package com.bamboo.baekjoon.global.swagger;
+package com.bamboo.baekjoon.global.config.swagger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
