@@ -160,7 +160,7 @@ public class CheckServiceImpl implements CheckService {
 
                                     check.admitCheck();
                                 } else {
-                                    if (probTier > (user.getUserTier() - 5)) {
+                                    if (probTier >= (user.getUserTier() - 5)) {
                                         CheckHistory history = CheckHistory.builder()
                                                 .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
                                                 .build();
