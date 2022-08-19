@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,11 @@ public class CheckControllerImpl implements CheckController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userIdList", value = "Check를 실행할 User의 Id List를 담은 JSON Body", required = true)
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "실행 성공"),
+            @ApiResponse(responseCode = "404", description = "문제 정보를 찾을 수 없음"),
+    })
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByUser(@RequestBody List<Long> userIdList) {
         List<CheckResponseDto.AfterRun> response = checkService.runCheckByUser(userIdList);
 
@@ -35,10 +42,17 @@ public class CheckControllerImpl implements CheckController {
     }
 
     @PostMapping("/admin/check/runByTerm")
-    @ApiOperation(value = "termId에 의한 Check 실행", notes = "termId에 해당하는 Check를 실행한다. termId를 List로 보낸다. PENDING인 Check만")
+    @ApiOperation(value = "termId에 의한 Check 실행", notes = "termId에 해당하는 Check를 실행한다. " +
+            "마감 기한이 되지 않은 Term인 경우 400. termId를 List로 보낸다. PENDING인 Check만")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "termIdList", value = "Check를 실행할 Term의 Id List를 담은 JSON Body", required = true)
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "실행 성공"),
+            @ApiResponse(responseCode = "400", description = "아직 마감이 되지 않은 Term"),
+            @ApiResponse(responseCode = "404", description = "문제 정보를 찾을 수 없음"),
+    })
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckByTerm(@RequestBody List<Long> termIdList) {
         List<CheckResponseDto.AfterRun> response = checkService.runCheckByTerm(termIdList);
 
@@ -50,6 +64,12 @@ public class CheckControllerImpl implements CheckController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "checkIdList", value = "Check를 실행할 Check의 Id List를 담은 JSON Body", required = true)
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "실행 성공"),
+            @ApiResponse(responseCode = "400", description = "아직 마감이 되지 않은 Check"),
+            @ApiResponse(responseCode = "404", description = "문제 정보를 찾을 수 없음"),
+    })
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<List<CheckResponseDto.AfterRun>> runCheckById(@RequestBody List<Long> checkIdList) {
         List<CheckResponseDto.AfterRun> response = checkService.runCheck(checkIdList);
 
@@ -61,6 +81,12 @@ public class CheckControllerImpl implements CheckController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "requestDto", value = "termId와 userId를 담은 JSON Body", required = true, dataTypeClass = CheckRequestDto.Create.class)
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "실행 성공"),
+            @ApiResponse(responseCode = "400", description = "유저가 비활성화되었거나 중복된 Term-User임"),
+            @ApiResponse(responseCode = "404", description = "User 또는 Term을 찾을 수 없음"),
+    })
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<CheckResponseDto.Simple> createCheck(@RequestBody CheckRequestDto.Create requestDto) {
         CheckResponseDto.Simple response = checkService.createCheck(requestDto);
 
@@ -72,6 +98,11 @@ public class CheckControllerImpl implements CheckController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "requestList", value = "termId와 userId의 List를 담은 JSON Body", required = true)
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "실행 성공"),
+            @ApiResponse(responseCode = "400", description = "User 또는 Term이 유효하지 않음"),
+    })
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<List<CheckResponseDto.Simple>> createChecks(@RequestBody List<CheckRequestDto.Create> requestList) {
         List<CheckResponseDto.Simple> response = checkService.createChecks(requestList);
 
@@ -84,6 +115,12 @@ public class CheckControllerImpl implements CheckController {
             @ApiImplicitParam(name = "id", value = "생성하려는 Check의 termId", required = true, dataTypeClass = Long.class, example = "4"),
             @ApiImplicitParam(name = "userIdList", value = "생성하려는 Check의 User Id List", required = true)
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "실행 성공"),
+            @ApiResponse(responseCode = "400", description = "중복된 Term-User임"),
+            @ApiResponse(responseCode = "404", description = "Term을 찾을 수 없음"),
+    })
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<List<CheckResponseDto.Simple>> createCheckBySingleTerm(@RequestParam(value = "id") Long termId,
                                                                                  @RequestBody List<Long> userIdList) {
         List<CheckResponseDto.Simple> response = checkService.createCheckBySingleTerm(termId, userIdList);
@@ -93,6 +130,9 @@ public class CheckControllerImpl implements CheckController {
 
     @GetMapping("/check/{id}")
     @ApiOperation(value = "단일 Check 조회 (Simple)", notes = "checkId를 통해 Check를 한 개 조회한다. (Simple)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Check를 찾을 수 없음"),
+    })
     public ResponseEntity<CheckResponseDto.Simple> searchCheckSimpleById(
             @ApiParam(name = "id", value = "조회할 Check의 id", example = "1") @PathVariable("id") Long id) {
         CheckResponseDto.Simple response = checkService.findCheckSimpleById(id);
@@ -110,6 +150,9 @@ public class CheckControllerImpl implements CheckController {
 
     @GetMapping("/check-detail/{id}")
     @ApiOperation(value = "단일 Check 조회 (Detail)", notes = "checkId를 통해 Check를 한 개 조회한다. (Detail)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Check를 찾을 수 없음"),
+    })
     public ResponseEntity<CheckResponseDto.Detail> searchCheckDetailById(
             @ApiParam(name = "id", value = "조회할 Check의 id", example = "1") @PathVariable("id") Long id) {
         CheckResponseDto.Detail response = checkService.findCheckDetailById(id);
@@ -142,6 +185,10 @@ public class CheckControllerImpl implements CheckController {
     // TODO: 수정 시 랭킹 정보도 수정하는 로직 추가해야함
     @PutMapping("/admin/check/{id}")
     @ApiOperation(value = "Check 정보 수정", notes = "checkId가 id인 Check 정보를 수정한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Check 또는 Term을 찾을 수 없음"),
+    })
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<CheckResponseDto.Detail> updateCheck(
             @ApiParam(name = "id", value = "수정할 Check의 id", example = "1") @PathVariable("id") Long id,
                                                                    @RequestBody CheckRequestDto.Update requestDto) {
@@ -152,6 +199,10 @@ public class CheckControllerImpl implements CheckController {
 
     @DeleteMapping("/admin/check/{id}")
     @ApiOperation(value = "Check 삭제", notes = "checkId가 id인 Check를 삭제한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "404", description = "Check를 찾을 수 없음"),
+    })
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<String> deleteCheck(
             @ApiParam(name = "id", value = "삭제할 Check의 id", example = "1") @PathVariable("id") Long id) {
         String response = checkService.deleteById(id);
@@ -164,6 +215,11 @@ public class CheckControllerImpl implements CheckController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "삭제할 Check의 Id List", required = true)
     })
+    @ApiResponses({
+            @ApiResponse(responseCode = "400", description = "Check Id를 입력해야 함"),
+            @ApiResponse(responseCode = "404", description = "Check가 존재하지 않음"),
+    })
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<String> deleteChecks(@RequestParam(value = "id") List<Long> params) {
         String response = checkService.deleteByParams(params);
 

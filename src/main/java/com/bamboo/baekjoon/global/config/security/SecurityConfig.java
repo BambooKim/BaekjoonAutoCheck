@@ -42,11 +42,16 @@ public class SecurityConfig {
 
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/api/v1/signup").permitAll()
-//                .antMatchers("/api/v1/login").permitAll()
-//                .antMatchers("/api/v1/admin/**").hasAnyRole("ADMIN")
-//                .anyRequest().hasAnyRole("ADMIN", "USER")
-                .anyRequest().permitAll()
+                .antMatchers(
+                    "/",
+                    "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/swagger-ui/**",
+                    "/h2-console/**",
+                    "/favicon.ico").permitAll()
+                .antMatchers("/api/v1/signup").permitAll()
+                .antMatchers("/api/v1/login").permitAll()
+                .antMatchers("/api/v1/admin/**").hasAnyRole("ADMIN")
+                .anyRequest().hasAnyRole("ADMIN", "USER")
+                //.anyRequest().permitAll()
 
                 .and()
                 .apply(new JwtSecurityConfig(tokenService));

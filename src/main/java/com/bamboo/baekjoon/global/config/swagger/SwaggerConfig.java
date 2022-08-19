@@ -26,6 +26,7 @@ public class SwaggerConfig {
         TypeResolver typeResolver = new TypeResolver();
 
         return new Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
                 .alternateTypeRules(AlternateTypeRules.newRule(
                         typeResolver.resolve(Pageable.class),
                         typeResolver.resolve(Page.class)

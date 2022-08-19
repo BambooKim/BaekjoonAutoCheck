@@ -21,11 +21,20 @@ public interface CheckRepository extends JpaRepository<Checks, Long> {
     @EntityGraph(attributePaths = {"user", "checkHistoryList"})
     List<Checks> findByStatusIsAndTermIn(CheckStatus status, List<Term> terms);
 
-    @Query("select c from Checks c join fetch c.user join fetch c.term where c.term.id in :termIdList and c.status = 'PENDING'")
-    List<Checks> findByStatusIsActiveAndTermIn(@Param("termIdList") List<Long> termIdList);
+    @Query("select c from Checks c " +
+            "join fetch c.user u " +
+            "join fetch c.term t " +
+            "where t.id in :termIdList " +
+            "and c.status = 'PENDING' ")
+    List<Checks> findByPendingAndTermIn(@Param("termIdList") List<Long> termIdList);
 
-    @Query("select c from Checks c join fetch c.user join fetch c.term where c.user.id in :userIdList and c.status = 'PENDING'")
-    List<Checks> findByUserIn(@Param("userIdList") List<Long> userIdList);
+    @Query("select c from Checks c " +
+            "join fetch c.user u " +
+            "join fetch c.term t " +
+            "where u.id in :userIdList " +
+            "and c.status = 'PENDING' " +
+            "and t.endAt < current_timestamp")
+    List<Checks> findByPendingAndTimeAndUserIn(@Param("userIdList") List<Long> userIdList);
 
     @Override
     @EntityGraph(attributePaths = {"user", "term"})

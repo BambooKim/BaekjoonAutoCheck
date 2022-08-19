@@ -49,12 +49,12 @@ public class CheckServiceImpl implements CheckService {
     @Override
     public List<CheckResponseDto.AfterRun> runCheckByTerm(List<Long> termIdList) {
 
-        return runCheckActual(checkRepository.findByStatusIsActiveAndTermIn(termIdList));
+        return runCheckActual(checkRepository.findByPendingAndTermIn(termIdList));
     }
 
     @Override
     public List<CheckResponseDto.AfterRun> runCheckByUser(List<Long> userIdList) {
-        List<Checks> findCheckList = checkRepository.findByUserIn(userIdList);
+        List<Checks> findCheckList = checkRepository.findByPendingAndTimeAndUserIn(userIdList);
 
         return runCheckActual(findCheckList);
     }

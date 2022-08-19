@@ -5,6 +5,7 @@ import com.bamboo.baekjoon.domain.checks.Checks;
 import com.bamboo.baekjoon.domain.checks.FailureReason;
 import com.bamboo.baekjoon.domain.term.dto.TermResponseDto;
 import com.bamboo.baekjoon.domain.user.dto.UserResponseDto;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -70,10 +71,19 @@ public class CheckResponseDto {
     @ToString
     public static class AfterRun {
 
+        @ApiModelProperty(value = "Check Id")
         private Long id;
+
+        @ApiModelProperty(value = "Check Status")
         private CheckStatus status;
+
+        @ApiModelProperty(value = "Check Result. True이면 성공, False이면 실패")
         private boolean success;
+
+        @ApiModelProperty(value = "실패시 실패 사유. 성공이면 null")
         private FailureReason reason;
+
+        @ApiModelProperty(value = "Check 실행 시간")
         private LocalDateTime runAt;
 
         public static AfterRun of(Checks check) {
