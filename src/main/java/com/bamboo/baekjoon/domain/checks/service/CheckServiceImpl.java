@@ -53,14 +53,16 @@ public class CheckServiceImpl implements CheckService {
 
     @Override
     public List<CheckResponseDto.AfterRun> runCheckByUser(List<Long> userIdList) {
+        List<Checks> findCheckList = checkRepository.findByUserIn(userIdList);
 
-        return runCheckActual(checkRepository.findByUserIn(userIdList));
+        return runCheckActual(findCheckList);
     }
 
     @Override
     public List<CheckResponseDto.AfterRun> runCheck(List<Long> checkIdList) {
+        List<Checks> findCheckList = checkRepository.findAllByStatusIsAndIdIn(CheckStatus.PENDING, checkIdList);
 
-        return runCheckActual(checkRepository.findAllByIdIn(checkIdList));
+        return runCheckActual(findCheckList);
     }
 
     public List<CheckResponseDto.AfterRun> runCheckActual(List<Checks> findCheckList) {
