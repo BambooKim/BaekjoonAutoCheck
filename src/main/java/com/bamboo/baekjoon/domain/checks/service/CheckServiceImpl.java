@@ -19,6 +19,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -226,18 +227,23 @@ public class CheckServiceImpl implements CheckService {
                 .user(findUser)
                 .build();
         check.setTerm(findTerm);
-        checkRepository.save(check);
+
+        try {
+            checkRepository.save(check);
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Term-User는 Unique여야 합니다.");
+        }
 
         return CheckResponseDto.Simple.of(check);
     }
 
     @Override
-    public List<CheckResponseDto.Simple> createChecks(CheckRequestDto.CreateList requestList) {
+    public List<CheckResponseDto.Simple> createChecks(List<CheckRequestDto.Create> requestList) {
         // requestList iter하면서 userId와 termId에 대한 HashSet 생성
         HashSet<Long> userIdSet = new HashSet<>();
         HashSet<Long> termIdSet = new HashSet<>();
 
-        requestList.getItems().forEach(item -> {
+        requestList.forEach(item -> {
             userIdSet.add(item.getUserId());
             termIdSet.add(item.getTermId());
         });
@@ -260,7 +266,7 @@ public class CheckServiceImpl implements CheckService {
 
         // requestList iter하면서 Check 생성 후 repository save -> response entity 생성 후 List add
         List<CheckResponseDto.Simple> responseList = new ArrayList<>();
-        requestList.getItems().forEach(request -> {
+        requestList.forEach(request -> {
             Checks check = Checks.builder()
                     .status(CheckStatus.PENDING)
                     .success(false)
@@ -295,7 +301,12 @@ public class CheckServiceImpl implements CheckService {
                     .user(user)
                     .build();
             check.setTerm(findTerm);
-            checkRepository.save(check);
+
+            try {
+                checkRepository.save(check);
+            } catch (DataIntegrityViolationException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Term-User는 Unique여야 합니다.");
+            }
 
             responseList.add(CheckResponseDto.Simple.of(check));
         });

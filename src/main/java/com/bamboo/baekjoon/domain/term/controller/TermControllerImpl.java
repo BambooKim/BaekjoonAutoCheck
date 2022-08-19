@@ -3,6 +3,9 @@ package com.bamboo.baekjoon.domain.term.controller;
 import com.bamboo.baekjoon.domain.term.dto.TermRequestDto;
 import com.bamboo.baekjoon.domain.term.dto.TermResponseDto;
 import com.bamboo.baekjoon.domain.term.service.TermService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +23,8 @@ public class TermControllerImpl implements TermController {
     private final TermService termService;
 
     @PostMapping("/admin/term")
+    @ApiOperation(value = "Term 생성", notes = "Term을 한 개 생성한다.")
+    @ApiImplicitParam(name = "requestDto", value = "생성할 Term의 정보를 담은 JSON Body", required = true)
     public ResponseEntity<TermResponseDto> createTerm(@Valid @RequestBody TermRequestDto requestDto) {
         TermResponseDto response = termService.createTerm(requestDto);
 
@@ -27,13 +32,17 @@ public class TermControllerImpl implements TermController {
     }
 
     @GetMapping("/term/{id}")
-    public ResponseEntity<TermResponseDto> searchTermById(@PathVariable("id") Long id) {
+    @ApiOperation(value = "단일 Term 조회", notes = "termId를 통해 Term 한 개를 조회한다.")
+    public ResponseEntity<TermResponseDto> searchTermById(
+            @ApiParam(name = "id", value = "조회할 Term의 id", required = true, example = "1") @PathVariable("id") Long id) {
         TermResponseDto response = termService.findTermById(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/term")
+    @ApiOperation(value = "Season의 전체 Term 조회", notes = "Pagination을 통해 Season의 전체 Term을 조회한다.")
+    @ApiImplicitParam(name = "seasonId", value = "Term을 조회할 Season의 id", required = true, example = "1")
     public ResponseEntity<Page<TermResponseDto>> getTermAll(@RequestParam("seasonId") Long seasonId, Pageable pageable) {
         Page<TermResponseDto> response = termService.getTermAll(seasonId, pageable);
 
@@ -41,7 +50,10 @@ public class TermControllerImpl implements TermController {
     }
 
     @PutMapping("/admin/term/{id}")
-    public ResponseEntity<TermResponseDto> updateTerm(@PathVariable("id") Long id,
+    @ApiOperation(value = "Term 정보 수정", notes = "특정 Term의 정보를 수정한다.")
+    @ApiImplicitParam(name = "requestDto", value = "수정할 Term의 정보", required = true)
+    public ResponseEntity<TermResponseDto> updateTerm(
+            @ApiParam(name = "id", value = "수정할 Term의 id", required = true, example = "1") @PathVariable("id") Long id,
                                                         @Valid @RequestBody TermRequestDto requestDto) {
         TermResponseDto response = termService.updateTerm(id, requestDto);
 
@@ -49,7 +61,9 @@ public class TermControllerImpl implements TermController {
     }
 
     @DeleteMapping("/admin/term/{id}")
-    public ResponseEntity<String> deleteTerm(@PathVariable("id") Long id) {
+    @ApiOperation(value = "Term 삭제", notes = "특정 Term을 삭제한다.")
+    public ResponseEntity<String> deleteTerm(
+            @ApiParam(name = "id", value = "삭제할 Term의 id", required = true, example = "1") @PathVariable("id") Long id) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(termService.deleteById(id));
     }
 }

@@ -1,10 +1,13 @@
 package com.bamboo.baekjoon.global.config.swagger;
 
+import com.fasterxml.classmate.TypeResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Pageable;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.AlternateTypeRules;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -20,7 +23,13 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() {
+        TypeResolver typeResolver = new TypeResolver();
+
         return new Docket(DocumentationType.SWAGGER_2)
+                .alternateTypeRules(AlternateTypeRules.newRule(
+                        typeResolver.resolve(Pageable.class),
+                        typeResolver.resolve(Page.class)
+                ))
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.any())

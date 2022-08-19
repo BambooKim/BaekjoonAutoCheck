@@ -22,7 +22,7 @@ public interface CheckService {
 
     CheckResponseDto.Detail updateCheck(Long id, CheckRequestDto.Update requestDto);
 
-    List<CheckResponseDto.Simple> createChecks(CheckRequestDto.CreateList requestList);
+    List<CheckResponseDto.Simple> createChecks(List<CheckRequestDto.Create> requestList);
 
     String deleteById(Long id);
 
