@@ -21,21 +21,6 @@ public interface CheckRepository extends JpaRepository<Checks, Long> {
     @EntityGraph(attributePaths = {"user", "checkHistoryList"})
     List<Checks> findByStatusIsAndTermIn(CheckStatus status, List<Term> terms);
 
-    @Query("select c from Checks c " +
-            "join fetch c.user u " +
-            "join fetch c.term t " +
-            "where t.id in :termIdList " +
-            "and c.status = 'PENDING' ")
-    List<Checks> findByPendingAndTermIn(@Param("termIdList") List<Long> termIdList);
-
-    @Query("select c from Checks c " +
-            "join fetch c.user u " +
-            "join fetch c.term t " +
-            "where u.id in :userIdList " +
-            "and c.status = 'PENDING' " +
-            "and t.endAt < current_timestamp")
-    List<Checks> findByPendingAndTimeAndUserIn(@Param("userIdList") List<Long> userIdList);
-
     @Override
     @EntityGraph(attributePaths = {"user", "term"})
     List<Checks> findAll();
@@ -53,15 +38,11 @@ public interface CheckRepository extends JpaRepository<Checks, Long> {
     @EntityGraph(attributePaths = {"user", "term"})
     Page<Checks> findByTermIn(List<Term> terms, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "term"})
-    List<Checks> findAllByStatusIsAndIdIn(CheckStatus status, List<Long> checkIdList);
-
     @Override
     @EntityGraph(attributePaths = {"user", "term"})
     Optional<Checks> findById(Long aLong);
 
-    @Query("select count(c) from Checks c where c.id in :paramList")
-    long countByList(@Param("paramList") List<Long> params);
+    long countByIdIn(@Param("paramList") List<Long> params);
 
     @Modifying
     @Transactional

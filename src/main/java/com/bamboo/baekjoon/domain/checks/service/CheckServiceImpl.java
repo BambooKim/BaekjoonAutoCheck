@@ -6,6 +6,7 @@ import com.bamboo.baekjoon.domain.checks.Checks;
 import com.bamboo.baekjoon.domain.checks.FailureReason;
 import com.bamboo.baekjoon.domain.checks.dto.CheckRequestDto;
 import com.bamboo.baekjoon.domain.checks.dto.CheckResponseDto;
+import com.bamboo.baekjoon.domain.checks.repository.CheckQueryRepository;
 import com.bamboo.baekjoon.domain.checks.repository.CheckRepository;
 import com.bamboo.baekjoon.domain.checks.repository.ChkHistoryRepository;
 import com.bamboo.baekjoon.domain.term.Term;
@@ -35,35 +36,42 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.bamboo.baekjoon.domain.checks.repository.CheckQueryRepository.*;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CheckServiceImpl implements CheckService {
 
     private final UserRepository userRepository;
-
     private final TermRepository termRepository;
     private final CheckRepository checkRepository;
     private final ChkHistoryRepository chkHistoryRepository;
 
+    private final CheckQueryRepository checkQueryRepository;
+
     @Override
     public List<CheckResponseDto.AfterRun> runCheckByTerm(List<Long> termIdList) {
+        RunCheckCondition condition = RunCheckCondition.builder()
+                .termIdList(termIdList).build();
 
-        return runCheckActual(checkRepository.findByPendingAndTermIn(termIdList));
+        return runCheckActual(checkQueryRepository.searchForRunCheck(condition));
     }
 
     @Override
     public List<CheckResponseDto.AfterRun> runCheckByUser(List<Long> userIdList) {
-        List<Checks> findCheckList = checkRepository.findByPendingAndTimeAndUserIn(userIdList);
+        RunCheckCondition condition = RunCheckCondition.builder()
+                .userIdList(userIdList).build();
 
-        return runCheckActual(findCheckList);
+        return runCheckActual(checkQueryRepository.searchForRunCheck(condition));
     }
 
     @Override
     public List<CheckResponseDto.AfterRun> runCheck(List<Long> checkIdList) {
-        List<Checks> findCheckList = checkRepository.findAllByStatusIsAndIdIn(CheckStatus.PENDING, checkIdList);
+        RunCheckCondition condition = RunCheckCondition.builder()
+                .checkIdList(checkIdList).build();
 
-        return runCheckActual(findCheckList);
+        return runCheckActual(checkQueryRepository.searchForRunCheck(condition));
     }
 
     public List<CheckResponseDto.AfterRun> runCheckActual(List<Checks> findCheckList) {
@@ -400,7 +408,7 @@ public class CheckServiceImpl implements CheckService {
 
     @Override
     public String deleteByParams(List<Long> params) {
-        if (params.size() != checkRepository.countByList(params))
+        if (params.size() != checkRepository.countByIdIn(params))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 Check Id 요청이 있습니다.");
 
         if (params.size() == 0)
