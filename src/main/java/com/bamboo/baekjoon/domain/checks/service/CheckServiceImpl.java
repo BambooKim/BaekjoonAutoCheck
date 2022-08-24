@@ -134,8 +134,15 @@ public class CheckServiceImpl implements CheckService {
                             break;
                         }
 
-                        Integer probNo = Integer.parseInt(tableRow.getElementsByAttributeValueContaining("href", "/problem")
-                                .get(0).text());
+                        Integer probNo = null;
+
+                        try {
+                             probNo = Integer.parseInt(tableRow.getElementsByAttributeValueContaining("href", "/problem")
+                                    .get(0).text());
+                        } catch (IndexOutOfBoundsException e) {
+                            continue;
+                        }
+
                         String probInfoUrl = "https://solved.ac/api/v3/search/problem?query=" + probNo;
 
                         String block = WebClient.create(probInfoUrl).get().accept(MediaType.APPLICATION_JSON)
