@@ -1,9 +1,6 @@
 package com.bamboo.baekjoon.domain.checks.service;
 
-import com.bamboo.baekjoon.domain.checks.CheckHistory;
-import com.bamboo.baekjoon.domain.checks.CheckStatus;
-import com.bamboo.baekjoon.domain.checks.Checks;
-import com.bamboo.baekjoon.domain.checks.FailureReason;
+import com.bamboo.baekjoon.domain.checks.*;
 import com.bamboo.baekjoon.domain.checks.dto.CheckRequestDto;
 import com.bamboo.baekjoon.domain.checks.dto.CheckResponseDto;
 import com.bamboo.baekjoon.domain.checks.repository.CheckQueryRepository;
@@ -36,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.bamboo.baekjoon.domain.checks.JudgePolicy.*;
 import static com.bamboo.baekjoon.domain.checks.repository.CheckQueryRepository.*;
 
 @Service
@@ -155,18 +153,13 @@ public class CheckServiceImpl implements CheckService {
                                 .getAsJsonObject().get("level").getAsInt();
 
                         for (Checks check : checks) {
-
-                            // CheckHistory가 Check당 한번만 생성되게 됨...
-//                            if (check.getStatus() == CheckStatus.COMPLETE)
-//                                continue;
-
                             Term term = check.getTerm();
                             if (solvedDateTime.isAfter(term.getStartAt()) && solvedDateTime.isBefore(term.getEndAt())) {
                                 // probNo, probTier, solvedAt, user, check -> CheckHistory
                                 // CheckHistory 생성
 
                                 // Check 성공/실패 판정
-                                if (user.getEnterYear() == 2022) {
+                                if (isSubmitPass(user, probTier)) {
                                     CheckHistory history = CheckHistory.builder()
                                             .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
                                             .build();
@@ -175,19 +168,10 @@ public class CheckServiceImpl implements CheckService {
 
                                     check.admitCheck();
                                 } else {
-                                    if (probTier >= (user.getUserTier() - 5)) {
-                                        CheckHistory history = CheckHistory.builder()
-                                                .probNo(probNo).probTier(probTier).solvedAt(solvedDateTime)
-                                                .build();
-                                        history.setCheck(check);
-                                        chkHistoryRepository.save(history);
-
-                                        check.admitCheck();
-                                    } else {
-                                        // 하나의 Check에 여러 문제를 풀었는데, 처음 제출은 성공인데 다음 제출이 TIER_UNMATCH인 경우
-                                        // -> 성공 처리해야함, 다시말해 성공이 아닐 때에만 진입하여 fail 처리해야함.
-                                        if (!check.isSuccess())
-                                            check.failCheck(FailureReason.TIER_UNMATCH);
+                                    // 하나의 Check에 여러 문제를 풀었는데, 처음 제출은 성공인데 다음 제출이 TIER_UNMATCH인 경우
+                                    // -> 성공 처리해야함, 다시말해 성공이 아닐 때에만 진입하여 fail 처리해야함.
+                                    if (!check.isSuccess()) {
+                                        check.failCheck(FailureReason.TIER_UNMATCH);
                                     }
                                 }
 
