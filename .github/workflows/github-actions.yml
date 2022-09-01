@@ -36,7 +36,6 @@ jobs:
     - name: Docker build & push
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-        cd ..
         docker build --build-arg db_url=${{ secrets.DB_URL }} --build-arg db_user=${{ secrets.DB_USER }} --build-arg db_password=${{ secrets.DB_PASSWORD }} --build-arg jwt_secret=${{ secrets.JWT_SECRET }} --build-arg jwt_token_validity_in_seconds=${{ secrets.JWT_TOKEN_VALIDITY_IN_SECONDS }} -t ${{ secrets.DOCKER_REPO }}/baekjoon-auto-check .
         docker push ${{ secrets.DOCKER_REPO }}/baekjoon-auto-check
     - name: Deploy
@@ -48,8 +47,7 @@ jobs:
        password: ${{ secrets.PASSWORD }}
        port: 22
        script: |
-        sudo docker rm -f $(docker ps -qa)
+        sudo docker rm -f baekjoon-auto-check
         sudo docker pull ${{ secrets.DOCKER_REPO }}/baekjoon-auto-check
-        docker image prune -f
-        
+        sudo docker run -d -p 8080:8080 --name baekjoon-auto-check rlaqjarn1008/baekjoon-auto-check
 
