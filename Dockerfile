@@ -15,4 +15,4 @@ ENV JWT_TOKEN_VALIDITY_IN_SECONDS=${jwt_token_validity_in_seconds}
 
 
 COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","-Dspring.datasource.url=jdbc:mysql://${DB_URL}/baekjoon","-Dspring.datasource.username=${DB_USER}","-Dspring.datasource.password=${DB_PASSWORD}","-Djwt-secret=${JWT_SECRET}","-Djwt-token-validity-in-seconds=${JWT_TOKEN_VALIDITY_IN_SECONDS}","/app.jar"]
+ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod","-Dspring.datasource.url=jdbc:mysql://${DB_URL}/baekjoon","-Dspring.datasource.username=${DB_USER}","-Dspring.datasource.password=${DB_PASSWORD}","-Djwt-secret=${JWT_SECRET}","-Djwt-token-validity-in-seconds=${JWT_TOKEN_VALIDITY_IN_SECONDS}","/app.jar"]
