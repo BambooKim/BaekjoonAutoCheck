@@ -147,3 +147,4 @@ Temporary Items
 /secrets/db_bamboo_password.txt
 /secrets/db_root_password.txt
 /baekjoon-mysql-volume/
+/src/test/resources/application.yml
