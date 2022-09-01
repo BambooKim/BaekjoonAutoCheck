@@ -49,5 +49,5 @@ jobs:
        script: |
         sudo docker rm -f baekjoon-auto-check
         sudo docker pull ${{ secrets.DOCKER_REPO }}/baekjoon-auto-check
-        
+        sudo docker run -d -p 8080:8080 --name baekjoon-auto-check rlaqjarn1008/baekjoon-auto-check
 
