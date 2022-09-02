@@ -158,6 +158,18 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(Token.Response.of(jwt), httpHeaders, HttpStatus.OK);
     }
 
+    @Override
+    public void resetPassword(User loginUser, UserRequestDto.PasswordReset pwData) {
+        UsernamePasswordAuthenticationToken authenticationToken
+                = new UsernamePasswordAuthenticationToken(loginUser.getUsername(), pwData.getCurrentPassword());
+
+        authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        loginUser.changePassword(passwordEncoder.encode(pwData.getNewPassword()));
+
+        userRepository.save(loginUser);
+    }
+
     private void validateDuplicateUser(String bojId, String username) {
         userRepository.findByBojId(bojId)
                 .ifPresent(m -> {

@@ -9,4 +9,6 @@ public interface SeasonService {
     SeasonResponseDto createSeason(SeasonRequestDto requestDto);
 
     Long addSeasonUser(Long seasonId, List<Long> userIdList);
+
+    List<SeasonResponseDto> findSeason(Long userId);
 }

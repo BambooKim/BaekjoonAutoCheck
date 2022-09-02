@@ -5,6 +5,7 @@ import com.bamboo.baekjoon.domain.rank.repository.RankRepository;
 import com.bamboo.baekjoon.domain.season.Season;
 import com.bamboo.baekjoon.domain.season.dto.SeasonRequestDto;
 import com.bamboo.baekjoon.domain.season.dto.SeasonResponseDto;
+import com.bamboo.baekjoon.domain.season.repository.SeasonQueryRepository;
 import com.bamboo.baekjoon.domain.season.repository.SeasonRepository;
 import com.bamboo.baekjoon.domain.user.User;
 import com.bamboo.baekjoon.domain.user.repository.UserRepository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -25,6 +27,7 @@ public class SeasonServiceImpl implements SeasonService {
     private final SeasonRepository seasonRepository;
     private final UserRepository userRepository;
     private final RankRepository rankRepository;
+    private final SeasonQueryRepository seasonQueryRepository;
 
     @Override
     public SeasonResponseDto createSeason(SeasonRequestDto requestDto) {
@@ -68,6 +71,14 @@ public class SeasonServiceImpl implements SeasonService {
         }
 
         return rankCount;
+    }
+
+    @Override
+    public List<SeasonResponseDto> findSeason(Long userId) {
+        return seasonQueryRepository.findSeasonByUserId(userId)
+                .stream()
+                .map(SeasonResponseDto::of)
+                .collect(Collectors.toList());
     }
 
     private void validateDateTime(SeasonRequestDto requestDto) {

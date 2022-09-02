@@ -2,11 +2,17 @@ package com.bamboo.baekjoon.domain.checks.repository;
 
 import com.bamboo.baekjoon.domain.checks.CheckStatus;
 import com.bamboo.baekjoon.domain.checks.Checks;
+import com.bamboo.baekjoon.domain.checks.dto.CheckResponseDto;
+import com.bamboo.baekjoon.domain.checks.dto.QCheckResponseDto_UserSeason;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +43,34 @@ public class CheckQueryRepository {
                         checks.status.eq(CheckStatus.PENDING)
                 )
                 .fetch();
+    }
+
+    public Page<CheckResponseDto.UserSeason> findCheckUserSeason(Long userId, Long seasonId, Pageable pageable) {
+        List<CheckResponseDto.UserSeason> content = queryFactory
+                .select(new QCheckResponseDto_UserSeason(
+                        term.id.as("termId"),
+                        checks.id.as("checkId"),
+                        checks.status,
+                        checks.success,
+                        checks.reason,
+                        checks.runAt,
+                        term.startAt,
+                        term.endAt
+                ))
+                .from(checks)
+                .join(checks.term, term)
+                .on(checks.user.id.eq(userId).and(term.season.id.eq(seasonId)))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(checks.count())
+                .from(checks)
+                .join(checks.term, term)
+                .on(checks.user.id.eq(userId).and(term.season.id.eq(seasonId)));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     private BooleanExpression termIdIn(List<Long> termIdList) {

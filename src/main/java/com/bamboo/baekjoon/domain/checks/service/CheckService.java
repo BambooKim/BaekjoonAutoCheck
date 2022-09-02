@@ -35,4 +35,6 @@ public interface CheckService {
     List<CheckResponseDto.AfterRun> runCheckByUser(List<Long> userIdList);
 
     List<CheckResponseDto.Simple> createCheckBySingleTerm(Long termId, List<Long> userIdList);
+
+    Page<CheckResponseDto.UserSeason> getTermByUserAndSeason(Long userId, Long seasonId, Pageable pageable);
 }

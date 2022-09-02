@@ -33,3 +33,8 @@ jwt:
 server:
   error:
     include-message: always
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false

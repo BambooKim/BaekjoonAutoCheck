@@ -53,4 +53,8 @@ public class User {
     public void changeStatus(UserStatus status) {
         this.status = status;
     }
+
+    public void changePassword(String newEncryptedPw) {
+        this.password = newEncryptedPw;
+    }
 }

@@ -5,6 +5,8 @@ import com.bamboo.baekjoon.domain.user.dto.UserRequestDto;
 import com.bamboo.baekjoon.domain.user.dto.UserResponseDto;
 import com.bamboo.baekjoon.domain.user.service.UserService;
 import com.bamboo.baekjoon.global.config.security.Token;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -46,6 +48,20 @@ public class UserControllerImpl implements UserController {
     })
     public ResponseEntity<?> login(@Valid @RequestBody Token.Request request) {
         return userService.login(request);
+    }
+
+    @PutMapping("/password")
+    @ApiOperation(value = "비밀번호 초기화", notes = "현재 비밀번호와 바꿀 비밀번호를 받아 초기화한다.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "pwData", value = "currentPassword: 현재 비밀번호\nnewPassword: 새 비밀번호", required = true)
+    })
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<String> resetPassword(@RequestBody UserRequestDto.PasswordReset pwData) {
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        userService.resetPassword(loginUser, pwData);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("success");
     }
 
     @PutMapping("/admin/user/status")

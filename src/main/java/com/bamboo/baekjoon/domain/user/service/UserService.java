@@ -1,5 +1,6 @@
 package com.bamboo.baekjoon.domain.user.service;
 
+import com.bamboo.baekjoon.domain.user.User;
 import com.bamboo.baekjoon.domain.user.dto.UserRequestDto;
 import com.bamboo.baekjoon.domain.user.dto.UserResponseDto;
 import com.bamboo.baekjoon.global.config.security.Token;
@@ -16,4 +17,6 @@ public interface UserService {
     List<UserResponseDto.Status> updateUserStatus(List<UserRequestDto.Status> list);
 
     ResponseEntity<?> login(Token.Request request);
+
+    void resetPassword(User loginUser, UserRequestDto.PasswordReset pwData);
 }

@@ -46,4 +46,15 @@ public class UserRequestDto {
         @NotEmpty(message = "Status를 입력해주세요.")
         private UserStatus status;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @ToString
+    public static class PasswordReset {
+
+        private String currentPassword;
+        private String newPassword;
+    }
 }

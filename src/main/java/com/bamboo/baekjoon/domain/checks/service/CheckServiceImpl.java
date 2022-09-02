@@ -314,6 +314,11 @@ public class CheckServiceImpl implements CheckService {
     }
 
     @Override
+    public Page<CheckResponseDto.UserSeason> getTermByUserAndSeason(Long userId, Long seasonId, Pageable pageable) {
+        return checkQueryRepository.findCheckUserSeason(userId, seasonId, pageable);
+    }
+
+    @Override
     public CheckResponseDto.Simple findCheckSimpleById(Long id) {
         Checks findCheck = checkRepository.findById(id).orElseThrow(() -> {
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Check가 존재하지 않습니다.");

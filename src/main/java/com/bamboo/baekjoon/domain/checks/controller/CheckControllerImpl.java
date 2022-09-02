@@ -3,6 +3,7 @@ package com.bamboo.baekjoon.domain.checks.controller;
 import com.bamboo.baekjoon.domain.checks.dto.CheckRequestDto;
 import com.bamboo.baekjoon.domain.checks.dto.CheckResponseDto;
 import com.bamboo.baekjoon.domain.checks.service.CheckService;
+import com.bamboo.baekjoon.domain.user.User;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -128,7 +130,19 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/check/{id}")
+    @GetMapping("/check")
+    @ApiOperation(value = "SeasonId로 유저의 Check(Term) 목록 조회", notes = "헤더에 JWT 토큰이 있어야 함.")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Page<CheckResponseDto.UserSeason>> getTermBySeasonId(@RequestParam("seasonId") Long seasonId, Pageable pageable) {
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = loginUser.getId();
+
+        Page<CheckResponseDto.UserSeason> result = checkService.getTermByUserAndSeason(userId, seasonId, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @GetMapping("/admin/check/{id}")
     @ApiOperation(value = "단일 Check 조회 (Simple)", notes = "checkId를 통해 Check를 한 개 조회한다. (Simple)")
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "Check를 찾을 수 없음"),
@@ -140,7 +154,7 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/check")
+    @GetMapping("/admin/check")
     @ApiOperation(value = "Check 조회 with Pagination (Simple)", notes = "Paginationa을 통해 전체 Check를 조회한다. (Simple)")
     public ResponseEntity<Page<CheckResponseDto.Simple>> getCheckSimpleAll(Pageable pageable) {
         Page<CheckResponseDto.Simple> response = checkService.getCheckSimpleAll(pageable);
@@ -148,7 +162,7 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/check-detail/{id}")
+    @GetMapping("/admin/check-detail/{id}")
     @ApiOperation(value = "단일 Check 조회 (Detail)", notes = "checkId를 통해 Check를 한 개 조회한다. (Detail)")
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "Check를 찾을 수 없음"),
@@ -160,7 +174,7 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/check-detail")
+    @GetMapping("/admin/check-detail")
     @ApiOperation(value = "Check 조회 with Pagination (Detail)", notes = "Paginationa을 통해 전체 Check를 조회한다. (Detail)")
     public ResponseEntity<Page<CheckResponseDto.Detail>> getCheckDetailAll(Pageable pageable) {
         Page<CheckResponseDto.Detail> response = checkService.getCheckDetailAll(pageable);
@@ -168,7 +182,7 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/checks")
+    @GetMapping("/admin/checks")
     @ApiOperation(value = "userId와 termId를 통해 Check 조회 with Pagination (Detail)",
             notes = "userId와 termId를 통해 Pagination된 Check Detail을 조회한다.\n" +
                     "이때 termId가 없다면 userId 기준으로만, userId가 없다면 termId 기준으로만 조회한다.\n" +

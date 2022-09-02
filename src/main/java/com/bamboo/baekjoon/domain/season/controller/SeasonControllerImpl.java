@@ -3,6 +3,7 @@ package com.bamboo.baekjoon.domain.season.controller;
 import com.bamboo.baekjoon.domain.season.dto.SeasonRequestDto;
 import com.bamboo.baekjoon.domain.season.dto.SeasonResponseDto;
 import com.bamboo.baekjoon.domain.season.service.SeasonService;
+import com.bamboo.baekjoon.domain.user.User;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,4 +56,16 @@ public class SeasonControllerImpl implements SeasonController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(addCount);
     }
+
+    @GetMapping("/season")
+    @ApiOperation(value = "유저의 Season 조회", notes = "로그인된 유저가 속해있는 Season의 정보들을 조회한다.")
+    public ResponseEntity<List<SeasonResponseDto>> getSeasonByUser() {
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = loginUser.getId();
+
+        List<SeasonResponseDto> result = seasonService.findSeason(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
 }

@@ -39,7 +39,7 @@ public class TermControllerImpl implements TermController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/term/{id}")
+    @GetMapping("/admin/term/{id}")
     @ApiOperation(value = "단일 Term 조회", notes = "termId를 통해 Term 한 개를 조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "404", description = "Term을 찾을 수 없음"),
@@ -51,7 +51,7 @@ public class TermControllerImpl implements TermController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/term")
+    @GetMapping("/admin/term")
     @ApiOperation(value = "Season의 전체 Term 조회", notes = "Pagination을 통해 Season의 전체 Term을 조회한다.")
     @ApiImplicitParam(name = "seasonId", value = "Term을 조회할 Season의 id", required = true, example = "1")
     @ApiResponses({

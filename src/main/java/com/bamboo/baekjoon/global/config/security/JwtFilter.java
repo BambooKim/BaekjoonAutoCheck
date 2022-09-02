@@ -2,8 +2,7 @@ package com.bamboo.baekjoon.global.config.security;
 
 import com.bamboo.baekjoon.domain.user.User;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,10 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends GenericFilterBean {
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
@@ -39,9 +37,13 @@ public class JwtFilter extends GenericFilterBean {
             User user = tokenService.getUserByToken(jwt);
             Authentication authentication = getAuthentication(user);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            logger.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+
+            User authUser = (User) authentication.getPrincipal();
+            String authUserString = "id=" + authUser.getId() + ", korName=" + authUser.getKorName() + ", username=" + authUser.getUsername();
+
+            log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authUserString, requestURI);
         } else {
-            logger.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+            log.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
