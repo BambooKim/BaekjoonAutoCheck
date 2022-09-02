@@ -1,17 +1,17 @@
 package com.bamboo.baekjoon.domain.user.controller;
 
+import com.bamboo.baekjoon.domain.user.User;
 import com.bamboo.baekjoon.domain.user.dto.UserRequestDto;
 import com.bamboo.baekjoon.domain.user.dto.UserResponseDto;
 import com.bamboo.baekjoon.domain.user.service.UserService;
 import com.bamboo.baekjoon.global.config.security.Token;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,7 +40,7 @@ public class UserControllerImpl implements UserController {
     @PostMapping("/login")
     @ApiOperation(value = "로그인", notes = "로그인에 성공하면 JWT를 반환받는다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = Token.Response.class))),
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
             @ApiResponse(responseCode = "401", description = "비밀번호가 일치하지 않음"),
             @ApiResponse(responseCode = "404", description = "없는 사용자임"),
     })
@@ -64,5 +64,13 @@ public class UserControllerImpl implements UserController {
         List<UserResponseDto.Tier> response = userService.updateUserTier(userIdList);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    }
+
+    @GetMapping("/user/whoami")
+    public String whoAmI() {
+
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return loginUser.getKorName();
     }
 }
