@@ -82,6 +82,15 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
+    @GetMapping("/user/fine")
+    public ResponseEntity<Long> getUserFine(@RequestParam(value = "seasonId") Long seasonId) {
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Long fineBySeason = userService.getUserFine(loginUser.getId(), seasonId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(fineBySeason);
+    }
+
     @GetMapping("/user/whoami")
     public String whoAmI() {
 

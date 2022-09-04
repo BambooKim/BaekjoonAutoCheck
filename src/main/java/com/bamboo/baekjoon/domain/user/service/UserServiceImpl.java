@@ -1,5 +1,6 @@
 package com.bamboo.baekjoon.domain.user.service;
 
+import com.bamboo.baekjoon.domain.checks.service.CheckService;
 import com.bamboo.baekjoon.domain.rank.repository.RankRepository;
 import com.bamboo.baekjoon.domain.season.repository.SeasonRepository;
 import com.bamboo.baekjoon.domain.user.Role;
@@ -50,6 +51,8 @@ public class UserServiceImpl implements UserService {
     private final TokenService tokenService;
 
     private final SeasonRepository seasonRepository;
+
+    private final CheckService checkService;
 
     @Override
     public UserResponseDto.Creation createUser(UserRequestDto.Creation createUserData) {
@@ -168,6 +171,13 @@ public class UserServiceImpl implements UserService {
         loginUser.changePassword(passwordEncoder.encode(pwData.getNewPassword()));
 
         userRepository.save(loginUser);
+    }
+
+    @Override
+    public Long getUserFine(Long userId, Long seasonId) {
+        Long count = checkService.countFailureCheck(userId, seasonId);
+
+        return count * 1000;
     }
 
     private void validateDuplicateUser(String bojId, String username) {

@@ -73,6 +73,16 @@ public class CheckQueryRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
+    public Long countFailureCheck(Long userId, Long seasonId) {
+        return queryFactory
+                .select(checks.count())
+                .from(checks)
+                .where(checks.user.id.eq(userId)
+                        .and(checks.term.season.id.eq(seasonId))
+                        .and(checks.success.isFalse()))
+                .fetchOne();
+    }
+
     private BooleanExpression termIdIn(List<Long> termIdList) {
         return termIdList != null ? term.id.in(termIdList) : null;
     }

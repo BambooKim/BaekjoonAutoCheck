@@ -19,4 +19,6 @@ public interface UserService {
     ResponseEntity<?> login(Token.Request request);
 
     void resetPassword(User loginUser, UserRequestDto.PasswordReset pwData);
+
+    Long getUserFine(Long userId, Long seasonId);
 }

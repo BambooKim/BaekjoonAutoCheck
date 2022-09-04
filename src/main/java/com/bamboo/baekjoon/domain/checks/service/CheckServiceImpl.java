@@ -319,6 +319,11 @@ public class CheckServiceImpl implements CheckService {
     }
 
     @Override
+    public Long countFailureCheck(Long userId, Long seasonId) {
+        return checkQueryRepository.countFailureCheck(userId, seasonId);
+    }
+
+    @Override
     public CheckResponseDto.Simple findCheckSimpleById(Long id) {
         Checks findCheck = checkRepository.findById(id).orElseThrow(() -> {
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 Check가 존재하지 않습니다.");

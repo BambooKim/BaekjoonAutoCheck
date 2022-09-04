@@ -37,4 +37,6 @@ public interface CheckService {
     List<CheckResponseDto.Simple> createCheckBySingleTerm(Long termId, List<Long> userIdList);
 
     Page<CheckResponseDto.UserSeason> getTermByUserAndSeason(Long userId, Long seasonId, Pageable pageable);
+
+    Long countFailureCheck(Long userId, Long seasonId);
 }
