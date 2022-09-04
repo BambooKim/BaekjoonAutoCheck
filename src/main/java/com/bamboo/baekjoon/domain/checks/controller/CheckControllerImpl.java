@@ -142,6 +142,15 @@ public class CheckControllerImpl implements CheckController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
+    @GetMapping("/check/history")
+    public ResponseEntity<Page<CheckResponseDto.History>> getUserCheckHistory(@RequestParam("checkId") Long checkId, Pageable pageable) {
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Page<CheckResponseDto.History> result = checkService.getUserCheckHistory(loginUser.getId(), checkId, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
     @GetMapping("/admin/check/{id}")
     @ApiOperation(value = "단일 Check 조회 (Simple)", notes = "checkId를 통해 Check를 한 개 조회한다. (Simple)")
     @ApiResponses({

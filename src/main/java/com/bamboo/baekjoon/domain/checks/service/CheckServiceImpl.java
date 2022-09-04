@@ -5,6 +5,7 @@ import com.bamboo.baekjoon.domain.checks.dto.CheckRequestDto;
 import com.bamboo.baekjoon.domain.checks.dto.CheckResponseDto;
 import com.bamboo.baekjoon.domain.checks.repository.CheckQueryRepository;
 import com.bamboo.baekjoon.domain.checks.repository.CheckRepository;
+import com.bamboo.baekjoon.domain.checks.repository.ChkHistoryQueryRepository;
 import com.bamboo.baekjoon.domain.checks.repository.ChkHistoryRepository;
 import com.bamboo.baekjoon.domain.term.Term;
 import com.bamboo.baekjoon.domain.term.repository.TermRepository;
@@ -47,6 +48,7 @@ public class CheckServiceImpl implements CheckService {
     private final ChkHistoryRepository chkHistoryRepository;
 
     private final CheckQueryRepository checkQueryRepository;
+    private final ChkHistoryQueryRepository historyQueryRepository;
 
     @Override
     public List<CheckResponseDto.AfterRun> runCheckByTerm(List<Long> termIdList) {
@@ -321,6 +323,23 @@ public class CheckServiceImpl implements CheckService {
     @Override
     public Long countFailureCheck(Long userId, Long seasonId) {
         return checkQueryRepository.countFailureCheck(userId, seasonId);
+    }
+
+    @Override
+    public Page<CheckResponseDto.History> getCheckHistory(List<Long> checkId, Pageable pageable) {
+        return historyQueryRepository.searchHistoryByUserAndCheck(checkId, pageable);
+    }
+
+    @Override
+    public Page<CheckResponseDto.History> getUserCheckHistory(Long userId, Long checkId, Pageable pageable) {
+        checkRepository.findById(checkId).ifPresentOrElse(check -> {
+            if (!check.getUser().getId().equals(userId))
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자의 Check가 아닙니다.");
+        }, () -> {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Check가 존재하지 않습니다.");
+        });
+
+        return getCheckHistory(List.of(checkId), pageable);
     }
 
     @Override

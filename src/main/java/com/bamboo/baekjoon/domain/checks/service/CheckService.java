@@ -39,4 +39,8 @@ public interface CheckService {
     Page<CheckResponseDto.UserSeason> getTermByUserAndSeason(Long userId, Long seasonId, Pageable pageable);
 
     Long countFailureCheck(Long userId, Long seasonId);
+
+    Page<CheckResponseDto.History> getCheckHistory(List<Long> checkId, Pageable pageable);
+
+    Page<CheckResponseDto.History> getUserCheckHistory(Long userId, Long checkId, Pageable pageable);
 }

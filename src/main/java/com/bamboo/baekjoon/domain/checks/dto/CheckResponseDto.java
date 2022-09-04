@@ -1,5 +1,6 @@
 package com.bamboo.baekjoon.domain.checks.dto;
 
+import com.bamboo.baekjoon.domain.checks.CheckHistory;
 import com.bamboo.baekjoon.domain.checks.CheckStatus;
 import com.bamboo.baekjoon.domain.checks.Checks;
 import com.bamboo.baekjoon.domain.checks.FailureReason;
@@ -92,6 +93,42 @@ public class CheckResponseDto {
                     .success(check.isSuccess())
                     .reason(check.getReason())
                     .runAt(check.getRunAt())
+                    .build();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @Builder
+    @ToString
+    public static class History {
+
+        @ApiModelProperty(value = "Check History Id")
+        private Long id;
+
+        @ApiModelProperty(value = "Problem No.")
+        private int probNo;
+
+        @ApiModelProperty(value = "Problem Tier")
+        private int probTier;
+
+        @ApiModelProperty(value = "문제 제출 시간")
+        private LocalDateTime solvedAt;
+
+        @QueryProjection
+        public History(Long id, int probNo, int probTier, LocalDateTime solvedAt) {
+            this.id = id;
+            this.probNo = probNo;
+            this.probTier = probTier;
+            this.solvedAt = solvedAt;
+        }
+
+        public static History of(CheckHistory history) {
+            return History.builder()
+                    .id(history.getId())
+                    .probNo(history.getProbNo())
+                    .probTier(history.getProbTier())
+                    .solvedAt(history.getSolvedAt())
                     .build();
         }
     }
