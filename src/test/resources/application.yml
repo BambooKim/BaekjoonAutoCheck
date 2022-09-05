@@ -1,21 +1,29 @@
 spring:
+  config:
+    activate:
+      on-profile: test
   datasource:
-    url: jdbc:h2:tcp://localhost/~/baekjoon
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=MySQL
     username: sa
     password:
-    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        format_sql: true
+#        dialect: org.hibernate.dialect.MySQL57Dialect
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  jpa:
-    hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-#        show_sql: true
-        format_sql: true
 
-logging:
-  level:
-    org.hibernate.SQL: debug
-#    org.hibernate.type: trace
+jwt:
+  header: Authorization
+  secret: secretForTestsecretForTestsecretForTestsecretForTestsecretForTestsecretForTestsecretForTestsecretForTestsecretForTestsecretForTestsecretForTestsecretForTest
+  token-validity-in-seconds: 3600
