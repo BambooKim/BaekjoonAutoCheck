@@ -29,7 +29,7 @@ public interface CheckRepository extends JpaRepository<Checks, Long> {
     @EntityGraph(attributePaths = {"user", "term"})
     Page<Checks> findAll(Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "term"})
+    @EntityGraph(attributePaths = {"user", "term", "term.season"})
     Page<Checks> findByUserInAndTermIn(List<User> users, List<Term> terms, Pageable pageable);
 
     @EntityGraph(attributePaths = {"user", "term"})

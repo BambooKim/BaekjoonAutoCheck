@@ -26,7 +26,9 @@ public class CheckHistory extends BaseTimeEntity {
     private LocalDateTime solvedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "check_id", nullable = false)
+    @JoinColumn(name = "check_id", nullable = false,
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)      // DDL, for test
+    )
     private Checks check;
 
     @Builder
